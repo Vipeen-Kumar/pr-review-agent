@@ -1,0 +1,14 @@
+spec_version: "0.1.0"
+name: pr-review-agent
+version: 0.1.0
+description: "AI agent that reviews GitHub pull requests"
+model:
+  preferred: "google:gemini-2.5-flash"
+skills:
+  - pr-review
+tags:
+  - hackathon
+  - code-review
+tools: [cli, read, write, memory]
+runtime:
+  max_turns: 50

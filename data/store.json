@@ -1,0 +1,171 @@
+{
+  "users": [
+    {
+      "id": "user_e4d33e462c3b3447",
+      "name": "Kabir Singh",
+      "email": "kabhikabirsingh@gmail.com",
+      "authProvider": "google",
+      "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocLDdG0E5aBlYeicRRBp20dneU72mcFjx850RGRzwbJJsIFiGg=s96-c",
+      "auth0Sub": "google-oauth2|102711064635932325134",
+      "createdAt": "2026-03-31T06:32:52.678Z"
+    },
+    {
+      "id": "user_bff8a993b7e1f82d",
+      "name": "Test User",
+      "email": "testvisible@example.com",
+      "passwordHash": "3feff05f82d14d312cf0b912dfd17562:a72f1f90810a0d41724b159d26904a063d48e031a9aead4d507ab6db23ac09988a45187c27d55fc5c7109b646f155862f56549242435a267217e4c1256782b1a",
+      "authProvider": "email",
+      "avatarUrl": "",
+      "createdAt": "2026-03-31T06:54:05.927Z"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "review_5658ecb0f078c540",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-03-31T06:43:37.192Z",
+      "input": {
+        "issueUrl": "https://github.com/learning-unlimited/ESP-Website/issues/5460",
+        "issueText": "Description\nI was reading through studentregsanity.py and noticed a variable scoping issue in the sanitize_walkin function. The loop that actually expires the registrations (for sr in srs:) is sitting outside the section loop. Because of this, it only ever processes the very last section.\n\nSteps to Reproduce\nSince this is a backend logic bug, here is how to spot it in the code:\n\nOpen esp/esp/program/controllers/studentregsanity.py.\n\nScroll to the sanitize_walkin function.\n\nNotice that the for sr in srs: block is outdented too far—it runs after the for sec in w.get_sections(): loop is completely finished.\n\nIf this runs on a program with multiple walk-in sections, earlier sections are completely skipped. Also, if there are 0 sections, the script will crash with an UnboundLocalError since srs is never assigned.\n\nExpected Behavior\nThe code should iterate through all sections and expire the walk-in registrations for every single section. (The sanitize_lunch function right below it handles this nesting correctly).\n\nActual Behavior\nIt only cleans up the last section because the cleanup loop just uses the leftover srs variable from the finished section loop.\n\nScreenshots\nNo response\n\nOperating System\nNo response\n\nBrowser\nNo response\n\nAdditional Context\nThe fix is pretty straightforward—just indent the for sr in srs: block and the report.append line so they sit inside the for sec... loop. I would like to work on this issue",
+        "prUrl": "https://github.com/learning-unlimited/ESP-Website/pull/5461",
+        "prText": "Description\nThis PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.\n\nI fixed the indentation so the registration cleanup loop is properly nested inside the section loop. While I was in there, I also made a tiny optimization: I moved the if not fake: check outside the for sr in srs: loop so it only evaluates once per section instead of redundantly for every single student registration.\n\nRelated Issue\nCloses #5460\n\nType of Change\n Bug fix\n New feature\n Breaking change\n Documentation update\n Refactor / cleanup\n CI/CD or build change\nTesting\n Existing tests pass\n New tests added (if applicable)\n Manually verified\nAI Disclosure\nUsed AI (Gemini) to help spot the exact lines for the scoping issue and format the bug report.\n\nChecklist\n Self-reviewed the code\n Updated documentation (if needed)\n No new warnings or errors introduced",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "learning-unlimited",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n7/10 - The PR description clearly outlines the fix and an associated optimization, demonstrating a good understanding of the",
+      "meta": {
+        "rating": "7/10 - The PR description clearly outlines the fix and an associated optimization, demonstrating a good understanding of the",
+        "summary": "Saved review",
+        "label": "https://github.com/learning-unlimited/ESP-Website/pull/5461"
+      }
+    },
+    {
+      "id": "review_16c0ec25d1896f7a",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-03-31T06:43:53.778Z",
+      "input": {
+        "issueUrl": "https://github.com/learning-unlimited/ESP-Website/issues/5460",
+        "issueText": "Description\nI was reading through studentregsanity.py and noticed a variable scoping issue in the sanitize_walkin function. The loop that actually expires the registrations (for sr in srs:) is sitting outside the section loop. Because of this, it only ever processes the very last section.\n\nSteps to Reproduce\nSince this is a backend logic bug, here is how to spot it in the code:\n\nOpen esp/esp/program/controllers/studentregsanity.py.\n\nScroll to the sanitize_walkin function.\n\nNotice that the for sr in srs: block is outdented too far—it runs after the for sec in w.get_sections(): loop is completely finished.\n\nIf this runs on a program with multiple walk-in sections, earlier sections are completely skipped. Also, if there are 0 sections, the script will crash with an UnboundLocalError since srs is never assigned.\n\nExpected Behavior\nThe code should iterate through all sections and expire the walk-in registrations for every single section. (The sanitize_lunch function right below it handles this nesting correctly).\n\nActual Behavior\nIt only cleans up the last section because the cleanup loop just uses the leftover srs variable from the finished section loop.\n\nScreenshots\nNo response\n\nOperating System\nNo response\n\nBrowser\nNo response\n\nAdditional Context\nThe fix is pretty straightforward—just indent the for sr in srs: block and the report.append line so they sit inside the for sec... loop. I would like to work on this issue",
+        "prUrl": "https://github.com/learning-unlimited/ESP-Website/pull/5461",
+        "prText": "Description\nThis PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.\n\nI fixed the indentation so the registration cleanup loop is properly nested inside the section loop. While I was in there, I also made a tiny optimization: I moved the if not fake: check outside the for sr in srs: loop so it only evaluates once per section instead of redundantly for every single student registration.\n\nRelated Issue\nCloses #5460\n\nType of Change\n Bug fix\n New feature\n Breaking change\n Documentation update\n Refactor / cleanup\n CI/CD or build change\nTesting\n Existing tests pass\n New tests added (if applicable)\n Manually verified\nAI Disclosure\nUsed AI (Gemini) to help spot the exact lines for the scoping issue and format the bug report.\n\nChecklist\n Self-reviewed the code\n Updated documentation (if needed)\n No new warnings or errors introduced",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "learning-unlimited",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n8/10 - The PR description clearly identifies the bug, proposes a correct fix, and includes a reasonable optimization,",
+      "meta": {
+        "rating": "8/10 - The PR description clearly identifies the bug, proposes a correct fix, and includes a reasonable optimization,",
+        "summary": "Saved review",
+        "label": "https://github.com/learning-unlimited/ESP-Website/pull/5461"
+      }
+    },
+    {
+      "id": "review_9a4127df1923bcd1",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-03-31T06:45:55.433Z",
+      "input": {
+        "issueUrl": "https://github.com/learning-unlimited/ESP-Website/issues/5460",
+        "issueText": "Description\nI was reading through studentregsanity.py and noticed a variable scoping issue in the sanitize_walkin function. The loop that actually expires the registrations (for sr in srs:) is sitting outside the section loop. Because of this, it only ever processes the very last section.\n\nSteps to Reproduce\nSince this is a backend logic bug, here is how to spot it in the code:\n\nOpen esp/esp/program/controllers/studentregsanity.py.\n\nScroll to the sanitize_walkin function.\n\nNotice that the for sr in srs: block is outdented too far—it runs after the for sec in w.get_sections(): loop is completely finished.\n\nIf this runs on a program with multiple walk-in sections, earlier sections are completely skipped. Also, if there are 0 sections, the script will crash with an UnboundLocalError since srs is never assigned.\n\nExpected Behavior\nThe code should iterate through all sections and expire the walk-in registrations for every single section. (The sanitize_lunch function right below it handles this nesting correctly).\n\nActual Behavior\nIt only cleans up the last section because the cleanup loop just uses the leftover srs variable from the finished section loop.\n\nScreenshots\nNo response\n\nOperating System\nNo response\n\nBrowser\nNo response\n\nAdditional Context\nThe fix is pretty straightforward—just indent the for sr in srs: block and the report.append line so they sit inside the for sec... loop. I would like to work on this issue",
+        "prUrl": "https://github.com/learning-unlimited/ESP-Website/pull/5461",
+        "prText": "Description\nThis PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.\n\nI fixed the indentation so the registration cleanup loop is properly nested inside the section loop. While I was in there, I also made a tiny optimization: I moved the if not fake: check outside the for sr in srs: loop so it only evaluates once per section instead of redundantly for every single student registration.\n\nRelated Issue\nCloses #5460\n\nType of Change\n Bug fix\n New feature\n Breaking change\n Documentation update\n Refactor / cleanup\n CI/CD or build change\nTesting\n Existing tests pass\n New tests added (if applicable)\n Manually verified\nAI Disclosure\nUsed AI (Gemini) to help spot the exact lines for the scoping issue and format the bug report.\n\nChecklist\n Self-reviewed the code\n Updated documentation (if needed)\n No new warnings or errors introduced",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "learning-unlimited",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n8/10 - The PR description clearly outlines the fix and an associated optimization, directly addressing the reported issue.",
+      "meta": {
+        "rating": "8/10 - The PR description clearly outlines the fix and an associated optimization, directly addressing the reported issue.",
+        "summary": "Saved review",
+        "label": "https://github.com/learning-unlimited/ESP-Website/pull/5461"
+      }
+    },
+    {
+      "id": "review_f5c91a2458b4aa48",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-03-31T06:48:24.836Z",
+      "input": {
+        "issueUrl": "https://github.com/learning-unlimited/ESP-Website/issues/5460",
+        "issueText": "Description\nI was reading through studentregsanity.py and noticed a variable scoping issue in the sanitize_walkin function. The loop that actually expires the registrations (for sr in srs:) is sitting outside the section loop. Because of this, it only ever processes the very last section.\n\nSteps to Reproduce\nSince this is a backend logic bug, here is how to spot it in the code:\n\nOpen esp/esp/program/controllers/studentregsanity.py.\n\nScroll to the sanitize_walkin function.\n\nNotice that the for sr in srs: block is outdented too far—it runs after the for sec in w.get_sections(): loop is completely finished.\n\nIf this runs on a program with multiple walk-in sections, earlier sections are completely skipped. Also, if there are 0 sections, the script will crash with an UnboundLocalError since srs is never assigned.\n\nExpected Behavior\nThe code should iterate through all sections and expire the walk-in registrations for every single section. (The sanitize_lunch function right below it handles this nesting correctly).\n\nActual Behavior\nIt only cleans up the last section because the cleanup loop just uses the leftover srs variable from the finished section loop.\n\nScreenshots\nNo response\n\nOperating System\nNo response\n\nBrowser\nNo response\n\nAdditional Context\nThe fix is pretty straightforward—just indent the for sr in srs: block and the report.append line so they sit inside the for sec... loop. I would like to work on this issue",
+        "prUrl": "",
+        "prText": "Description\nThis PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.\n\nI fixed the indentation so the registration cleanup loop is properly nested inside the section loop. While I was in there, I also made a tiny optimization: I moved the if not fake: check outside the for sr in srs: loop so it only evaluates once per section instead of redundantly for every single student registration.\n\nRelated Issue\nCloses #5460\n\nType of Change\n Bug fix\n New feature\n Breaking change\n Documentation update\n Refactor / cleanup\n CI/CD or build change\nTesting\n Existing tests pass\n New tests added (if applicable)\n Manually verified\nAI Disclosure\nUsed AI (Gemini) to help spot the exact lines for the scoping issue and format the bug report.\n\nChecklist\n Self-reviewed the code\n Updated documentation (if needed)\n No new warnings or errors introduced",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "learning-unlimited",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n8/10 - The PR description is clear, addresses the core issue, and includes a reasonable optimization.\n\n##",
+      "meta": {
+        "rating": "8/10 - The PR description is clear, addresses the core issue, and includes a reasonable optimization.",
+        "summary": "Saved review",
+        "label": "https://github.com/learning-unlimited/ESP-Website/issues/5460"
+      }
+    },
+    {
+      "id": "review_5a6c1cfe4bae0cac",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-03-31T06:51:17.278Z",
+      "input": {
+        "issueUrl": "https://github.com/learning-unlimited/ESP-Website/issues/5460",
+        "issueText": "Description\nI was reading through studentregsanity.py and noticed a variable scoping issue in the sanitize_walkin function. The loop that actually expires the registrations (for sr in srs:) is sitting outside the section loop. Because of this, it only ever processes the very last section.\n\nSteps to Reproduce\nSince this is a backend logic bug, here is how to spot it in the code:\n\nOpen esp/esp/program/controllers/studentregsanity.py.\n\nScroll to the sanitize_walkin function.\n\nNotice that the for sr in srs: block is outdented too far—it runs after the for sec in w.get_sections(): loop is completely finished.\n\nIf this runs on a program with multiple walk-in sections, earlier sections are completely skipped. Also, if there are 0 sections, the script will crash with an UnboundLocalError since srs is never assigned.\n\nExpected Behavior\nThe code should iterate through all sections and expire the walk-in registrations for every single section. (The sanitize_lunch function right below it handles this nesting correctly).\n\nActual Behavior\nIt only cleans up the last section because the cleanup loop just uses the leftover srs variable from the finished section loop.\n\nScreenshots\nNo response\n\nOperating System\nNo response\n\nBrowser\nNo response\n\nAdditional Context\nThe fix is pretty straightforward—just indent the for sr in srs: block and the report.append line so they sit inside the for sec... loop. I would like to work on this issue",
+        "prUrl": "",
+        "prText": "Description\nThis PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.\n\nI fixed the indentation so the registration cleanup loop is properly nested inside the section loop. While I was in there, I also made a tiny optimization: I moved the if not fake: check outside the for sr in srs: loop so it only evaluates once per section instead of redundantly for every single student registration.\n\nRelated Issue\nCloses #5460\n\nType of Change\n Bug fix\n New feature\n Breaking change\n Documentation update\n Refactor / cleanup\n CI/CD or build change\nTesting\n Existing tests pass\n New tests added (if applicable)\n Manually verified\nAI Disclosure\nUsed AI (Gemini) to help spot the exact lines for the scoping issue and format the bug report.\n\nChecklist\n Self-reviewed the code\n Updated documentation (if needed)\n No new warnings or errors introduced",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "learning-unlimited",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n8/10 - The PR description is clear, directly addresses the issue, and includes a sensible optimization.\n\n## Summary",
+      "meta": {
+        "rating": "8/10 - The PR description is clear, directly addresses the issue, and includes a sensible optimization.",
+        "summary": "Saved review",
+        "label": "https://github.com/learning-unlimited/ESP-Website/issues/5460"
+      }
+    },
+    {
+      "id": "review_da0633cecaf2f96d",
+      "userId": "user_bff8a993b7e1f82d",
+      "createdAt": "2026-03-31T06:54:19.336Z",
+      "input": {
+        "issueUrl": "",
+        "issueText": "Fix scoping bug in sanitize_walkin so all sections are processed.",
+        "prUrl": "",
+        "prText": "This PR fixes the indentation bug in sanitize_walkin and moves a repeated condition outside the inner loop.",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "learning-unlimited",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n7/10 - The PR description is clear about its intent but could be more explicit on the bug fix details and testing.\n\n## Summary\nThis PR fixes the indentation bug in sanitize_walkin and moves a repeated condition outside the inner loop.\n\n## Key Observations\n- The PR description explains the intended fix in a clear and reviewer-friendly way.\n- The issue context gives enough detail to understand the bug and expected behavior.\n\n## Potential Issues / Risks\n- Implementation details should still be checked against the actual changed code before merging.\n- Testing details are not very explicit, so a quick validation note would strengthen the PR.\n\n## Suggestions / Improvements\n- Add a short testing note so reviewers can verify the behavior quickly.\n- Keep the PR summary tightly focused on the bug, fix, and expected impact.\n\n## Better PR\nTitle\nFix issue described in the linked context\n\nWhat changed\nThis PR fixes the indentation bug in sanitize_walkin and moves a repeated condition outside the inner loop.\n\nWhy\nThis PR fixes the indentation bug in sanitize_walkin and moves a repeated condition outside the inner loop.\n\nTesting\nManually verified the described behavior and confirmed the intended fix path.",
+      "meta": {
+        "rating": "7/10 - The PR description is clear about its intent but could be more explicit on the bug fix details and testing.",
+        "summary": "This PR fixes the indentation bug in sanitize_walkin and moves a repeated condition outside the inner loop.",
+        "label": "This PR fixes the indentation bug in sanitize_walkin and moves a repeated condition outside the inner loop."
+      }
+    },
+    {
+      "id": "review_efdeba1be053407c",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-03-31T07:21:28.339Z",
+      "input": {
+        "issueUrl": "https://github.com/learning-unlimited/ESP-Website/issues/5460",
+        "issueText": "Description\nI was reading through studentregsanity.py and noticed a variable scoping issue in the sanitize_walkin function. The loop that actually expires the registrations (for sr in srs:) is sitting outside the section loop. Because of this, it only ever processes the very last section.\n\nSteps to Reproduce\nSince this is a backend logic bug, here is how to spot it in the code:\n\nOpen esp/esp/program/controllers/studentregsanity.py.\n\nScroll to the sanitize_walkin function.\n\nNotice that the for sr in srs: block is outdented too far—it runs after the for sec in w.get_sections(): loop is completely finished.\n\nIf this runs on a program with multiple walk-in sections, earlier sections are completely skipped. Also, if there are 0 sections, the script will crash with an UnboundLocalError since srs is never assigned.\n\nExpected Behavior\nThe code should iterate through all sections and expire the walk-in registrations for every single section. (The sanitize_lunch function right below it handles this nesting correctly).\n\nActual Behavior\nIt only cleans up the last section because the cleanup loop just uses the leftover srs variable from the finished section loop.\n\nScreenshots\nNo response\n\nOperating System\nNo response\n\nBrowser\nNo response\n\nAdditional Context\nThe fix is pretty straightforward—just indent the for sr in srs: block and the report.append line so they sit inside the for sec... loop. I would like to work on this issue",
+        "prUrl": "https://github.com/learning-unlimited/ESP-Website/pull/5461",
+        "prText": "Description\nThis PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.\n\nI fixed the indentation so the registration cleanup loop is properly nested inside the section loop. While I was in there, I also made a tiny optimization: I moved the if not fake: check outside the for sr in srs: loop so it only evaluates once per section instead of redundantly for every single student registration.\n\nRelated Issue\nCloses #5460\n\nType of Change\n Bug fix\n New feature\n Breaking change\n Documentation update\n Refactor / cleanup\n CI/CD or build change\nTesting\n Existing tests pass\n New tests added (if applicable)\n Manually verified\nAI Disclosure\nUsed AI (Gemini) to help spot the exact lines for the scoping issue and format the bug report.\n\nChecklist\n Self-reviewed the code\n Updated documentation (if needed)\n No new warnings or errors introduced",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "learning-unlimited",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n9/10 - The PR description is clear, directly addresses the issue, and includes a reasonable optimization, allowing for a confident review of its intent.\n\n## Summary\nDescription This PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.\n\n## Key Observations\n- The PR description explains the intended fix in a clear and reviewer-friendly way.\n- The issue context gives enough detail to understand the bug and expected behavior.\n\n## Potential Issues / Risks\n- Implementation details should still be checked against the actual changed code before merging.\n\n## Suggestions / Improvements\n- Add a short testing note so reviewers can verify the behavior quickly.\n- Keep the PR summary tightly focused on the bug, fix, and expected impact.\n\n## Better PR\nTitle\nFix issue described in the linked context\n\nWhat changed\nDescription This PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.\n\nWhy\nDescription This PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.\n\nTesting\nManually verified the described behavior and confirmed the intended fix path.",
+      "meta": {
+        "rating": "9/10 - The PR description is clear, directly addresses the issue, and includes a reasonable optimization, allowing for a confident review of its intent.",
+        "summary": "Description This PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.",
+        "label": "https://github.com/learning-unlimited/ESP-Website/pull/5461"
+      }
+    }
+  ]
+}

@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PR Review Agent</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body data-theme="light">
+    <div class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">AI PR Review Workspace</p>
+          <h1>Review pull requests, save history, and come back to every decision.</h1>
+          <p class="hero-copy">
+            Sign in with email or Google, review PRs against issue context and company
+            standards, and keep your previous reviews tied to your profile.
+          </p>
+        </div>
+
+        <div class="hero-actions">
+          <button id="historyToggle" class="theme-toggle" type="button" aria-label="Open review history">
+            <span class="menu-icon" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </button>
+
+          <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme">
+            <span id="themeIcon" class="theme-icon" aria-hidden="true">&#9790;</span>
+          </button>
+
+          <div id="profileCard" class="profile-card hidden">
+            <div id="profileAvatar" class="avatar"></div>
+            <div class="profile-copy">
+              <strong id="profileName"></strong>
+              <span id="profileEmail"></span>
+            </div>
+            <button id="logoutButton" class="ghost-button" type="button">Log out</button>
+          </div>
+        </div>
+      </header>
+
+      <section id="authPanel" class="auth-panel panel">
+        <div class="auth-header">
+          <div>
+            <p class="section-kicker">Account</p>
+            <h2>Log in or create your review workspace.</h2>
+          </div>
+          <div class="auth-tabs">
+            <button id="showLogin" class="tab-button active" type="button">Login</button>
+            <button id="showSignup" class="tab-button" type="button">Sign up</button>
+          </div>
+        </div>
+
+        <p id="authMessage" class="auth-message"></p>
+
+        <div class="auth-grid">
+          <form id="loginForm" class="auth-form">
+            <label class="field">
+              <span>Email</span>
+              <input name="email" type="email" placeholder="you@example.com" required />
+            </label>
+
+            <label class="field">
+              <span>Password</span>
+              <input name="password" type="password" placeholder="Enter your password" required />
+            </label>
+
+            <div class="auth-actions">
+              <button class="primary-button" type="submit">Login</button>
+              <button id="googleLogin" class="google-button" type="button">Continue with Google</button>
+            </div>
+          </form>
+
+          <form id="signupForm" class="auth-form hidden">
+            <label class="field">
+              <span>Name</span>
+              <input name="name" type="text" placeholder="Your name" required />
+            </label>
+
+            <label class="field">
+              <span>Email</span>
+              <input name="email" type="email" placeholder="you@example.com" required />
+            </label>
+
+            <label class="field">
+              <span>Password</span>
+              <input name="password" type="password" placeholder="Create a password" required />
+            </label>
+
+            <div class="auth-actions">
+              <button class="primary-button" type="submit">Create account</button>
+              <button id="googleSignup" class="google-button" type="button">Sign up with Google</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <main class="layout">
+        <section class="panel form-panel">
+          <div class="section-header">
+            <div>
+              <p class="section-kicker">New Review</p>
+              <h2>Run a review</h2>
+            </div>
+            <span id="authGateText" class="status-badge">Login required to save reviews</span>
+          </div>
+
+          <form id="reviewForm">
+            <div class="field-grid">
+              <label class="field">
+                <span>Company Name</span>
+                <input id="companyName" name="companyName" type="text" placeholder="Acme Inc." />
+              </label>
+
+              <label class="field">
+                <span>Issue URL</span>
+                <input id="issueUrl" name="issueUrl" type="url" placeholder="https://github.com/org/repo/issues/123" />
+              </label>
+            </div>
+
+            <div class="field-grid">
+              <label class="field">
+                <span>PR URL</span>
+                <input id="prUrl" name="prUrl" type="url" placeholder="https://github.com/org/repo/pull/456" />
+              </label>
+
+              <label class="field">
+                <span>Company Format File (Optional)</span>
+                <input id="guidelinesFile" name="guidelinesFile" type="file" accept=".txt,.md,.json" />
+              </label>
+            </div>
+
+            <label class="field">
+              <span>PR Text or Diff</span>
+              <textarea
+                id="prText"
+                name="prText"
+                rows="8"
+                placeholder="Paste the PR description, diff, or reviewable code here."
+              ></textarea>
+            </label>
+
+            <label class="field">
+              <span>Issue Text (Optional)</span>
+              <textarea
+                id="issueText"
+                name="issueText"
+                rows="4"
+                placeholder="Paste issue details here if the issue URL is not enough."
+              ></textarea>
+            </label>
+
+            <div class="code-shell">
+              <div class="section-header compact">
+                <div>
+                  <p class="section-kicker">Code Changes</p>
+                  <h3>Compare old and new code</h3>
+                </div>
+              </div>
+
+              <div class="field-grid code-grid">
+                <label class="field">
+                  <span>Previous Code (Optional)</span>
+                  <textarea
+                    id="previousCode"
+                    name="previousCode"
+                    rows="8"
+                    placeholder="Paste the old code here."
+                  ></textarea>
+                </label>
+
+                <label class="field">
+                  <span>Current Code (Optional)</span>
+                  <textarea
+                    id="currentCode"
+                    name="currentCode"
+                    rows="8"
+                    placeholder="Paste the updated code here."
+                  ></textarea>
+                </label>
+              </div>
+            </div>
+
+            <label class="field">
+              <span>Company PR Formatting / Review Rules (Optional)</span>
+              <textarea
+                id="companyGuidelines"
+                name="companyGuidelines"
+                rows="6"
+                placeholder="Example: PRs must include summary, test plan, rollout notes, and screenshots for UI changes."
+              ></textarea>
+            </label>
+
+            <div class="actions">
+              <button class="primary-button" type="submit">Review PR</button>
+              <p class="helper-text">
+                Reviews are saved to your account automatically after each successful run.
+              </p>
+            </div>
+          </form>
+        </section>
+
+        <section class="sidebar">
+          <section class="panel result-panel">
+            <div class="result-header">
+              <h2>Review Output</h2>
+              <span id="statusBadge" class="status-badge">Idle</span>
+            </div>
+            <div id="result" class="result-box result-empty">Your PR review will appear here.</div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <aside id="historyDrawer" class="history-drawer hidden">
+      <div class="history-drawer-header">
+        <div>
+          <p class="section-kicker">Saved Reviews</p>
+          <h2>History</h2>
+        </div>
+        <button id="historyClose" class="ghost-button" type="button">Close</button>
+      </div>
+      <div id="historyList" class="history-list">
+        <p class="empty-history">Log in to see your previous PR reviews.</p>
+      </div>
+    </aside>
+    <div id="historyBackdrop" class="history-backdrop hidden"></div>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
