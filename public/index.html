@@ -109,6 +109,34 @@
           </div>
 
           <form id="reviewForm">
+            <div class="github-panel">
+              <div class="section-header compact">
+                <div>
+                  <p class="section-kicker">GitHub Integration</p>
+                  <h3>Fetch PR and post review comments</h3>
+                </div>
+                <button id="fetchPrButton" class="ghost-button" type="button">Fetch PR</button>
+              </div>
+
+              <div id="githubStatus" class="github-status">
+                Paste a GitHub PR URL and fetch live title, description, and changed files.
+              </div>
+
+              <div id="githubMeta" class="github-meta hidden"></div>
+
+              <div class="checkbox-row">
+                <label class="checkbox-field">
+                  <input id="fetchFromGitHub" name="fetchFromGitHub" type="checkbox" checked />
+                  <span>Auto-fetch PR details from GitHub before review</span>
+                </label>
+
+                <label class="checkbox-field">
+                  <input id="postComment" name="postComment" type="checkbox" />
+                  <span>Post the generated review back to the PR as a GitHub comment</span>
+                </label>
+              </div>
+            </div>
+
             <div class="field-grid">
               <label class="field">
                 <span>Company Name</span>
@@ -197,7 +225,7 @@
             <div class="actions">
               <button class="primary-button" type="submit">Review PR</button>
               <p class="helper-text">
-                Reviews are saved to your account automatically after each successful run.
+                Reviews are saved automatically. GitHub comments are posted only if you enable that option.
               </p>
             </div>
           </form>
@@ -209,6 +237,7 @@
               <h2>Review Output</h2>
               <span id="statusBadge" class="status-badge">Idle</span>
             </div>
+            <p id="commentStatus" class="comment-status hidden"></p>
             <div id="result" class="result-box result-empty">Your PR review will appear here.</div>
           </section>
         </section>

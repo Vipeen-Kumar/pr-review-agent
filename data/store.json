@@ -5,7 +5,7 @@
       "name": "Kabir Singh",
       "email": "kabhikabirsingh@gmail.com",
       "authProvider": "google",
-      "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocLDdG0E5aBlYeicRRBp20dneU72mcFjx850RGRzwbJJsIFiGg=s96-c",
+      "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocKwGMBO6meI48CtRZ976VV0GBJt1vpQzlL0zo8FlR9tnCb083DA=s96-c",
       "auth0Sub": "google-oauth2|102711064635932325134",
       "createdAt": "2026-03-31T06:32:52.678Z"
     },
@@ -166,6 +166,38 @@
         "summary": "Description This PR fixes the scoping bug in sanitize_walkin where it was skipping earlier walk-in sections and only expiring registrations for the very last one.",
         "label": "https://github.com/learning-unlimited/ESP-Website/pull/5461"
       }
+    },
+    {
+      "id": "review_ba3b24e9190d6708",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-04-02T12:29:39.219Z",
+      "input": {
+        "issueUrl": "https://github.com/learning-unlimited/ESP-Website/issues/4709",
+        "issueText": "",
+        "prUrl": "https://github.com/learning-unlimited/ESP-Website/pull/4710",
+        "prText": "",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "learning-unlimited",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n9/10 - High confidence in the review due to clear code diff and well-described changes.\n\n## Summary\nGitHub PR Title: Fix incorrect response index in get_class_application_2 and get_class_application_3\n\n## Key Observations\n- The PR description explains the intended fix in a clear and reviewer-friendly way.\n\n## Potential Issues / Risks\n- Implementation details should still be checked against the actual changed code before merging.\n\n## Suggestions / Improvements\n- Add a short testing note so reviewers can verify the behavior quickly.\n- Keep the PR summary tightly focused on the bug, fix, and expected impact.\n\n## Better PR\nTitle\nFix issue described in the linked context\n\nWhat changed\nGitHub PR Title: Fix incorrect response index in get_class_application_2 and get_class_application_3\n\nWhy\nGitHub PR Title: Fix incorrect response index in get_class_application_2 and get_class_application_3\n\nTesting\nManually verified the described behavior and confirmed the intended fix path.",
+      "meta": {
+        "rating": "9/10 - High confidence in the review due to clear code diff and well-described changes.",
+        "summary": "GitHub PR Title: Fix incorrect response index in get_class_application_2 and get_class_application_3",
+        "label": "https://github.com/learning-unlimited/ESP-Website/pull/4710"
+      },
+      "githubPr": {
+        "title": "Fix incorrect response index in get_class_application_2 and get_class_application_3",
+        "author": "Vipeen-Kumar",
+        "changedFiles": 1,
+        "additions": 2,
+        "deletions": 2,
+        "headBranch": "fix/class-application-response-index-4709",
+        "baseBranch": "main",
+        "htmlUrl": "https://github.com/learning-unlimited/ESP-Website/pull/4710"
+      },
+      "githubCommentUrl": ""
     }
   ]
 }

@@ -190,6 +190,52 @@ textarea {
   gap: 16px;
 }
 
+.github-panel {
+  border: 1px solid var(--panel-border);
+  border-radius: 22px;
+  padding: 18px;
+  margin-bottom: 18px;
+  background: rgba(127, 127, 127, 0.04);
+}
+
+.github-status,
+.comment-status {
+  margin: 10px 0 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.github-meta {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--result-bg);
+}
+
+.github-meta strong,
+.comment-status a {
+  color: var(--accent-strong);
+}
+
+.checkbox-row {
+  display: grid;
+  gap: 12px;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--text);
+}
+
+.checkbox-field input {
+  width: auto;
+  margin-top: 2px;
+}
+
 .layout {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;

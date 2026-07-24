@@ -21,6 +21,7 @@ const dataDir = path.join(__dirname, "data");
 const storePath = path.join(dataDir, "store.json");
 const port = Number(process.env.PORT || 3000);
 const sessionSecret = process.env.SESSION_SECRET || "local-dev-session-secret";
+const githubToken = process.env.GITHUB_TOKEN || "";
 const auth0Domain = process.env.AUTH0_DOMAIN || "";
 const auth0ClientId = process.env.AUTH0_CLIENT_ID || "";
 const auth0ClientSecret = process.env.AUTH0_CLIENT_SECRET || "";
@@ -203,6 +204,136 @@ function createSession(response, userId) {
   setSessionCookie(response, sessionId);
 }
 
+function parseGitHubPullUrl(prUrl) {
+  try {
+    const url = new URL(prUrl);
+    if (url.hostname !== "github.com") {
+      return null;
+    }
+
+    const parts = url.pathname.split("/").filter(Boolean);
+    if (parts.length < 4 || parts[2] !== "pull") {
+      return null;
+    }
+
+    const pullNumber = Number(parts[3]);
+    if (!pullNumber) {
+      return null;
+    }
+
+    return {
+      owner: parts[0],
+      repo: parts[1],
+      pullNumber,
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function githubRequest(pathname, options = {}) {
+  if (!githubToken) {
+    throw new Error("GitHub integration is not configured. Add GITHUB_TOKEN to .env.");
+  }
+
+  const response = await fetch(`https://api.github.com${pathname}`, {
+    ...options,
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${githubToken}`,
+      "User-Agent": "pr-review-agent",
+      ...(options.headers || {}),
+    },
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "GitHub API request failed.");
+  }
+
+  return data;
+}
+
+function summarizeGithubFiles(files) {
+  return files
+    .slice(0, 12)
+    .map((file) => {
+      const patchPreview = (file.patch || "").slice(0, 1200);
+      return [
+        `File: ${file.filename}`,
+        `Status: ${file.status}`,
+        `Additions: ${file.additions}, Deletions: ${file.deletions}`,
+        patchPreview ? `Patch:\n${patchPreview}` : "Patch: Not available",
+      ].join("\n");
+    })
+    .join("\n\n");
+}
+
+async function fetchGitHubPullRequest(prUrl) {
+  const parsed = parseGitHubPullUrl(prUrl);
+  if (!parsed) {
+    throw new Error("Enter a valid GitHub pull request URL.");
+  }
+
+  const pr = await githubRequest(
+    `/repos/${parsed.owner}/${parsed.repo}/pulls/${parsed.pullNumber}`,
+  );
+  const files = await githubRequest(
+    `/repos/${parsed.owner}/${parsed.repo}/pulls/${parsed.pullNumber}/files`,
+  );
+
+  return {
+    owner: parsed.owner,
+    repo: parsed.repo,
+    pullNumber: parsed.pullNumber,
+    title: pr.title || "",
+    body: pr.body || "",
+    state: pr.state || "",
+    draft: Boolean(pr.draft),
+    author: pr.user?.login || "",
+    headBranch: pr.head?.ref || "",
+    baseBranch: pr.base?.ref || "",
+    changedFiles: pr.changed_files || files.length,
+    additions: pr.additions || 0,
+    deletions: pr.deletions || 0,
+    files,
+    filesSummary: summarizeGithubFiles(files),
+    htmlUrl: pr.html_url || prUrl,
+  };
+}
+
+function mergeGitHubIntoInput(input, githubPr) {
+  return {
+    ...input,
+    prText: [
+      githubPr.title ? `GitHub PR Title:\n${githubPr.title}` : "",
+      githubPr.body ? `GitHub PR Description:\n${githubPr.body}` : "",
+      githubPr.filesSummary ? `GitHub Changed Files:\n${githubPr.filesSummary}` : "",
+      input.prText ? `User PR Notes:\n${input.prText}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n"),
+  };
+}
+
+async function postGitHubComment(prUrl, body) {
+  const parsed = parseGitHubPullUrl(prUrl);
+  if (!parsed) {
+    throw new Error("A valid GitHub PR URL is required to post a comment.");
+  }
+
+  return githubRequest(
+    `/repos/${parsed.owner}/${parsed.repo}/issues/${parsed.pullNumber}/comments`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ body }),
+    },
+  );
+}
+
 async function readRequestBody(request) {
   const chunks = [];
 
@@ -307,6 +438,7 @@ async function handleMe(request, response) {
       user: null,
       reviews: [],
       googleAuthEnabled: Boolean(auth0Domain && auth0ClientId && auth0ClientSecret),
+      githubIntegrationEnabled: Boolean(githubToken),
     });
     return;
   }
@@ -320,7 +452,24 @@ async function handleMe(request, response) {
     user,
     reviews,
     googleAuthEnabled: Boolean(auth0Domain && auth0ClientId && auth0ClientSecret),
+    githubIntegrationEnabled: Boolean(githubToken),
   });
+}
+
+async function handleGitHubFetch(request, response) {
+  const user = await getAuthenticatedUser(request);
+  if (!user) {
+    sendJson(response, 401, { error: "Please log in to fetch pull requests." });
+    return;
+  }
+
+  try {
+    const body = JSON.parse((await readRequestBody(request)) || "{}");
+    const githubPr = await fetchGitHubPullRequest(body.prUrl || "");
+    sendJson(response, 200, { githubPr });
+  } catch (error) {
+    sendJson(response, 400, { error: error.message || "Unable to fetch this PR." });
+  }
 }
 
 async function handleReview(request, response) {
@@ -343,8 +492,22 @@ async function handleReview(request, response) {
       companyName: body.companyName || "",
       companyGuidelines: body.companyGuidelines || "",
     };
+    let githubPr = null;
+    if (body.fetchFromGitHub && input.prUrl) {
+      githubPr = await fetchGitHubPullRequest(input.prUrl);
+    }
 
-    const review = await reviewSubmission(input);
+    const reviewInput = githubPr ? mergeGitHubIntoInput(input, githubPr) : input;
+    const review = await reviewSubmission(reviewInput);
+
+    let githubComment = null;
+    if (body.postComment && input.prUrl) {
+      githubComment = await postGitHubComment(
+        input.prUrl,
+        `## Automated PR Review\n\n${review}`,
+      );
+    }
+
     const meta = extractReviewMeta(review, input);
     const store = await readStore();
     const record = {
@@ -354,12 +517,30 @@ async function handleReview(request, response) {
       input,
       review,
       meta,
+      githubPr: githubPr
+        ? {
+            title: githubPr.title,
+            author: githubPr.author,
+            changedFiles: githubPr.changedFiles,
+            additions: githubPr.additions,
+            deletions: githubPr.deletions,
+            headBranch: githubPr.headBranch,
+            baseBranch: githubPr.baseBranch,
+            htmlUrl: githubPr.htmlUrl,
+          }
+        : null,
+      githubCommentUrl: githubComment?.html_url || "",
     };
 
     store.reviews.push(record);
     await writeStore(store);
 
-    sendJson(response, 200, { review, reviewRecord: record });
+    sendJson(response, 200, {
+      review,
+      reviewRecord: record,
+      githubPr: record.githubPr,
+      githubCommentUrl: record.githubCommentUrl,
+    });
   } catch (error) {
     sendJson(response, 400, { error: error.message || "Unable to review this submission." });
   }
@@ -505,6 +686,11 @@ const server = createServer(async (request, response) => {
 
   if (request.method === "POST" && pathname === "/api/review") {
     await handleReview(request, response);
+    return;
+  }
+
+  if (request.method === "POST" && pathname === "/api/github/fetch-pr") {
+    await handleGitHubFetch(request, response);
     return;
   }
 

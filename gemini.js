@@ -209,6 +209,7 @@ Instructions:
 1. If code diff or code changes are provided:
    - Perform a focused technical review covering correctness, edge cases, code quality, performance, security, test coverage, and UI/UX when relevant.
    - Give specific and actionable suggestions.
+   - If GitHub file patches are included, use them as the primary source of implementation detail.
 2. If code diff is not provided:
    - Do not complain about missing code diff.
    - Do not list what cannot be reviewed.

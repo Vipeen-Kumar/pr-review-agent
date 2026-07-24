@@ -5,6 +5,10 @@ const themeIcon = document.getElementById("themeIcon");
 const statusBadge = document.getElementById("statusBadge");
 const companyGuidelines = document.getElementById("companyGuidelines");
 const guidelinesFile = document.getElementById("guidelinesFile");
+const fetchPrButton = document.getElementById("fetchPrButton");
+const githubStatus = document.getElementById("githubStatus");
+const githubMeta = document.getElementById("githubMeta");
+const commentStatus = document.getElementById("commentStatus");
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 const showLogin = document.getElementById("showLogin");
@@ -24,11 +28,15 @@ const historyToggle = document.getElementById("historyToggle");
 const historyDrawer = document.getElementById("historyDrawer");
 const historyClose = document.getElementById("historyClose");
 const historyBackdrop = document.getElementById("historyBackdrop");
+const fetchFromGitHubCheckbox = document.getElementById("fetchFromGitHub");
+const postCommentCheckbox = document.getElementById("postComment");
 
 const state = {
   currentUser: null,
   reviews: [],
   googleAuthEnabled: false,
+  githubIntegrationEnabled: false,
+  fetchedGitHubPr: null,
 };
 
 function applyTheme(theme) {
@@ -161,6 +169,25 @@ function setAuthMessage(message) {
   authMessage.textContent = message || "";
 }
 
+function setGitHubStatus(message) {
+  githubStatus.textContent = message || "";
+}
+
+function renderGitHubMeta(pr) {
+  if (!pr) {
+    githubMeta.classList.add("hidden");
+    githubMeta.innerHTML = "";
+    return;
+  }
+
+  githubMeta.classList.remove("hidden");
+  githubMeta.innerHTML = `
+    <div><strong>${escapeHtml(pr.title || "Untitled PR")}</strong></div>
+    <div>Author: ${escapeHtml(pr.author || "Unknown")} | Base: ${escapeHtml(pr.baseBranch || "-")} | Head: ${escapeHtml(pr.headBranch || "-")}</div>
+    <div>Changed files: ${escapeHtml(String(pr.changedFiles || 0))} | Additions: ${escapeHtml(String(pr.additions || 0))} | Deletions: ${escapeHtml(String(pr.deletions || 0))}</div>
+  `;
+}
+
 function setHistoryDrawer(open) {
   historyDrawer.classList.toggle("hidden", !open);
   historyBackdrop.classList.toggle("hidden", !open);
@@ -233,8 +260,15 @@ async function refreshSession() {
   state.currentUser = data.user;
   state.reviews = data.reviews || [];
   state.googleAuthEnabled = Boolean(data.googleAuthEnabled);
+  state.githubIntegrationEnabled = Boolean(data.githubIntegrationEnabled);
   googleLogin.disabled = !state.googleAuthEnabled;
   googleSignup.disabled = !state.googleAuthEnabled;
+  fetchPrButton.disabled = !state.githubIntegrationEnabled;
+  fetchFromGitHubCheckbox.disabled = !state.githubIntegrationEnabled;
+  postCommentCheckbox.disabled = !state.githubIntegrationEnabled;
+  if (!state.githubIntegrationEnabled) {
+    setGitHubStatus("GitHub integration is disabled. Add GITHUB_TOKEN to .env to enable PR fetch and comment posting.");
+  }
   renderProfile();
   renderHistory();
 }
@@ -294,6 +328,41 @@ function startGoogleAuth() {
   window.location.href = "/auth/google/start";
 }
 
+async function fetchPullRequestDetails() {
+  const prUrl = document.getElementById("prUrl").value.trim();
+  if (!prUrl) {
+    setGitHubStatus("Enter a GitHub PR URL first.");
+    return;
+  }
+
+  setGitHubStatus("Fetching pull request details from GitHub...");
+
+  try {
+    const response = await fetch("/api/github/fetch-pr", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prUrl }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || "Unable to fetch this pull request.");
+    }
+
+    state.fetchedGitHubPr = data.githubPr;
+    setGitHubStatus("GitHub PR fetched successfully. The review will use live title, body, and changed files.");
+    renderGitHubMeta(data.githubPr);
+  } catch (error) {
+    state.fetchedGitHubPr = null;
+    renderGitHubMeta(null);
+    setGitHubStatus(error.message);
+  }
+}
+
+fetchPrButton.addEventListener("click", fetchPullRequestDetails);
+
 googleLogin.addEventListener("click", startGoogleAuth);
 googleSignup.addEventListener("click", startGoogleAuth);
 
@@ -335,11 +404,15 @@ reviewForm.addEventListener("submit", async (event) => {
     previousCode: formData.get("previousCode")?.toString() || "",
     currentCode: formData.get("currentCode")?.toString() || "",
     companyGuidelines: formData.get("companyGuidelines")?.toString() || "",
+    fetchFromGitHub: Boolean(formData.get("fetchFromGitHub")),
+    postComment: Boolean(formData.get("postComment")),
   };
 
   statusBadge.textContent = "Reviewing";
   resultElement.classList.add("result-empty");
   resultElement.textContent = "Analyzing the issue, PR, and company expectations...";
+  commentStatus.classList.add("hidden");
+  commentStatus.textContent = "";
 
   try {
     const response = await fetch("/api/review", {
@@ -360,6 +433,15 @@ reviewForm.addEventListener("submit", async (event) => {
     resultElement.innerHTML = renderReview(data.review);
     state.reviews = [data.reviewRecord, ...state.reviews];
     renderHistory();
+    if (data.githubPr) {
+      state.fetchedGitHubPr = data.githubPr;
+      renderGitHubMeta(data.githubPr);
+      setGitHubStatus("Live GitHub PR details were used for this review.");
+    }
+    if (data.githubCommentUrl) {
+      commentStatus.classList.remove("hidden");
+      commentStatus.innerHTML = `Comment posted to GitHub: <a href="${data.githubCommentUrl}" target="_blank" rel="noreferrer">${data.githubCommentUrl}</a>`;
+    }
   } catch (error) {
     statusBadge.textContent = "Error";
     resultElement.classList.add("result-empty");
