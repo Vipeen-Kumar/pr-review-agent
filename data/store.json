@@ -230,6 +230,38 @@
         "htmlUrl": "https://github.com/learning-unlimited/ESP-Website/pull/5461"
       },
       "githubCommentUrl": ""
+    },
+    {
+      "id": "review_2a90ddc9c3fa8d9a",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-07-24T15:41:32.481Z",
+      "input": {
+        "issueUrl": "https://github.com/vacanza/holidays/issues/3232",
+        "issueText": "",
+        "prUrl": "https://github.com/vacanza/holidays/pull/3426",
+        "prText": "",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n7/10 — Strong PR structure and localization updates, but the provided diff is cut off and missing the unit test file.\n\n## Summary\nGitHub PR Title: Update India holidays: add Bonalu holiday in Telangana (TS)\n\n## Key Observations\n- The PR description explains the intended fix in a clear and reviewer-friendly way.\n\n## Potential Issues / Risks\n- Implementation details should still be checked against the actual changed code before merging.\n\n## Suggestions / Improvements\n- Add a short testing note so reviewers can verify the behavior quickly.\n- Keep the PR summary tightly focused on the bug, fix, and expected impact.\n\n## Better PR\nTitle\nFix issue described in the linked context\n\nWhat changed\nGitHub PR Title: Update India holidays: add Bonalu holiday in Telangana (TS)\n\nWhy\nGitHub PR Title: Update India holidays: add Bonalu holiday in Telangana (TS)\n\nTesting\nManually verified the described behavior and confirmed the intended fix path.",
+      "meta": {
+        "rating": "7/10 — Strong PR structure and localization updates, but the provided diff is cut off and missing the unit test file.",
+        "summary": "GitHub PR Title: Update India holidays: add Bonalu holiday in Telangana (TS)",
+        "label": "https://github.com/vacanza/holidays/pull/3426"
+      },
+      "githubPr": {
+        "title": "Update India holidays: add Bonalu holiday in Telangana (TS)",
+        "author": "Vikash-Kumar-23",
+        "changedFiles": 15,
+        "additions": 121,
+        "deletions": 12,
+        "headBranch": "feature/telangana-holidays",
+        "baseBranch": "dev",
+        "htmlUrl": "https://github.com/vacanza/holidays/pull/3426"
+      },
+      "githubCommentUrl": ""
     }
   ]
 }
