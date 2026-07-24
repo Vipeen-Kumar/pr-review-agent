@@ -3,7 +3,7 @@ name: pr-review-agent
 version: 0.1.0
 description: "AI agent that reviews GitHub pull requests"
 model:
-  preferred: "google:gemini-2.5-flash"
+  preferred: "google:gemini-2.0-flash"
 skills:
   - pr-review
 tags:

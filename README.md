@@ -130,7 +130,7 @@ Create or update `.env` with your Gemini key:
 ```env
 GEMINI_API_KEY=your_gemini_api_key
 GOOGLE_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-2.0-flash
 SESSION_SECRET=change_me
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
@@ -235,7 +235,7 @@ Example output:
 
 - The UI supports both light mode and dark mode
 - The project can review using URLs, pasted PR text, or both
-- The current default model is `gemini-2.5-flash`
+- The current default model is `gemini-2.0-flash`
 - If your API quota is limited, you may need to adjust the model or billing setup
 
 ## Future Improvements
