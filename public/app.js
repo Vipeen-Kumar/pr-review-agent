@@ -39,6 +39,17 @@ const state = {
   fetchedGitHubPr: null,
 };
 
+function validatePrUrl() {
+  const prUrlInput = document.getElementById("prUrl");
+  const prUrl = prUrlInput.value.trim();
+  if (!prUrl) {
+    prUrlInput.setCustomValidity("Please enter a GitHub Pull Request URL.");
+    return false;
+  }
+  prUrlInput.setCustomValidity("");
+  return true;
+}
+
 function applyTheme(theme) {
   document.body.dataset.theme = theme;
   themeIcon.innerHTML = theme === "dark" ? "&#9728;" : "&#9790;";
@@ -387,6 +398,10 @@ historyBackdrop.addEventListener("click", () => setHistoryDrawer(false));
 reviewForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
+  if (!validatePrUrl()) {
+    return;
+  }
+
   if (!state.currentUser) {
     setAuthMessage("Please log in before creating a review.");
     authPanel.classList.remove("hidden");
@@ -398,12 +413,7 @@ reviewForm.addEventListener("submit", async (event) => {
   const payload = {
     companyName: formData.get("companyName")?.toString() || "",
     issueUrl: formData.get("issueUrl")?.toString() || "",
-    issueText: formData.get("issueText")?.toString() || "",
     prUrl: formData.get("prUrl")?.toString() || "",
-    prText: formData.get("prText")?.toString() || "",
-    previousCode: formData.get("previousCode")?.toString() || "",
-    currentCode: formData.get("currentCode")?.toString() || "",
-    companyGuidelines: formData.get("companyGuidelines")?.toString() || "",
     fetchFromGitHub: Boolean(formData.get("fetchFromGitHub")),
     postComment: Boolean(formData.get("postComment")),
   };

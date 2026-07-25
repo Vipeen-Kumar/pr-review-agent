@@ -151,8 +151,8 @@
 
             <div class="field-grid">
               <label class="field">
-                <span>PR URL</span>
-                <input id="prUrl" name="prUrl" type="url" placeholder="https://github.com/org/repo/pull/456" />
+                <span>PR URL * (Required)</span>
+                <input id="prUrl" name="prUrl" type="url" placeholder="https://github.com/org/repo/pull/456" required />
               </label>
 
               <label class="field">
@@ -160,67 +160,6 @@
                 <input id="guidelinesFile" name="guidelinesFile" type="file" accept=".txt,.md,.json" />
               </label>
             </div>
-
-            <label class="field">
-              <span>PR Text or Diff</span>
-              <textarea
-                id="prText"
-                name="prText"
-                rows="8"
-                placeholder="Paste the PR description, diff, or reviewable code here."
-              ></textarea>
-            </label>
-
-            <label class="field">
-              <span>Issue Text (Optional)</span>
-              <textarea
-                id="issueText"
-                name="issueText"
-                rows="4"
-                placeholder="Paste issue details here if the issue URL is not enough."
-              ></textarea>
-            </label>
-
-            <div class="code-shell">
-              <div class="section-header compact">
-                <div>
-                  <p class="section-kicker">Code Changes</p>
-                  <h3>Compare old and new code</h3>
-                </div>
-              </div>
-
-              <div class="field-grid code-grid">
-                <label class="field">
-                  <span>Previous Code (Optional)</span>
-                  <textarea
-                    id="previousCode"
-                    name="previousCode"
-                    rows="8"
-                    placeholder="Paste the old code here."
-                  ></textarea>
-                </label>
-
-                <label class="field">
-                  <span>Current Code (Optional)</span>
-                  <textarea
-                    id="currentCode"
-                    name="currentCode"
-                    rows="8"
-                    placeholder="Paste the updated code here."
-                  ></textarea>
-                </label>
-              </div>
-            </div>
-
-            <label class="field">
-              <span>Company PR Formatting / Review Rules (Optional)</span>
-              <textarea
-                id="companyGuidelines"
-                name="companyGuidelines"
-                rows="6"
-                placeholder="Example: PRs must include summary, test plan, rollout notes, and screenshots for UI changes."
-              ></textarea>
-            </label>
 
             <div class="actions">
               <button class="primary-button" type="submit">Review PR</button>
