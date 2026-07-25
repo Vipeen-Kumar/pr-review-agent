@@ -1,7 +1,19 @@
 import { randomBytes } from "node:crypto";
+import { getInitials } from "./session.js";
 
 function createId(prefix) {
   return `${prefix}_${randomBytes(8).toString("hex")}`;
+}
+
+function sanitizeUser(user) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    authProvider: user.authProvider,
+    avatarUrl: user.avatarUrl || "",
+    initials: getInitials(user.name || user.email),
+  };
 }
 
 function parseGitHubPullUrl(prUrl) {
@@ -79,6 +91,7 @@ function mergeGitHubIntoInput(input, githubPr) {
 
 export {
   createId,
+  sanitizeUser,
   parseGitHubPullUrl,
   summarizeGithubFiles,
   extractReviewMeta,

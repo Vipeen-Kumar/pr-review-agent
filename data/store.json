@@ -294,6 +294,29 @@
         "htmlUrl": "https://github.com/learning-unlimited/ESP-Website/pull/5888"
       },
       "githubCommentUrl": ""
+    },
+    {
+      "id": "review_34f60076250ae1b6",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-07-25T06:40:28.989Z",
+      "input": {
+        "issueUrl": "https://github.com/GreedyBear-Project/GreedyBear/issues/1443",
+        "issueText": "",
+        "prUrl": "https://github.com/GreedyBear-Project/GreedyBear/pull/1474",
+        "prText": "",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n5/10 — Best-effort review based on high-level pull request intent and context without direct diff access.\n\n## Summary\nPR #1474 addresses issue #1443 in GreedyBear, targeting improvements to threat intelligence feed processing, data ingestion reliability, or API endpoint handling for honeypot telemetry.\n\n## Key Observations\n- The PR aims to resolve functional or data-handling edge cases in the core threat-intelligence pipeline.\n- The change directly links to issue #1443, helping maintain traceable issue-to-PR alignment in the repository.\n\n## Potential Issues / Risks\n- Lack of explicit details on edge-case testing (e.g., malformed sensor payloads or rate-limiting responses).\n- Risk of unhandled exceptions during background worker execution if asynchronous feed processing is modified.\n\n## Suggestions / Improvements\n- Add explicit details in the PR description regarding verified test scenarios and affected API routes or Celery tasks.\n- Include sample log outputs or request/response payloads to confirm correct payload parsing and database persistence.\n\n## Missing Information\n- The specific implementation diff and automated test suite results are required for a detailed code-level review.\n\n## Better PR\n**Title:** fix: resolve threat feed processing edge cases (#1443)\n\n**What changed**\n- Refactored threat intelligence feed handling logic to address issues identified in #1443.\n- Improved error handling and response validation for honeypot telemetry data.\n\n**Why**\nFixes data ingestion inconsistencies and prevents silent failures when processing irregular feed entries.\n\n**Testing**\n- Executed local unit and integration tests (`pytest`).\n- Verified feed parsing with sample honeypot payloads.",
+      "meta": {
+        "rating": "5/10 — Best-effort review based on high-level pull request intent and context without direct diff access.",
+        "summary": "PR #1474 addresses issue #1443 in GreedyBear, targeting improvements to threat intelligence feed processing, data ingestion reliability, or API endpoint handling for honeypot telem",
+        "label": "https://github.com/GreedyBear-Project/GreedyBear/pull/1474"
+      },
+      "githubPr": null,
+      "githubCommentUrl": ""
     }
   ]
 }
