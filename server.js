@@ -1,26 +1,39 @@
 import { createServer } from "node:http";
-import { readFile, writeFile, mkdir, access } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
-import {
-  createHash,
-  createHmac,
-  randomBytes,
-  scryptSync,
-  timingSafeEqual,
-} from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { reviewSubmission } from "./gemini.js";
+import { readStore, writeStore } from "./storage/store.js";
+import { hashPassword, verifyPassword } from "./utils/password.js";
+import {
+  sessions,
+  signValue,
+  setSessionCookie,
+  clearSessionCookie,
+  parseCookies,
+  getVerifiedSessionId,
+  createSession,
+  getAuthenticatedUser,
+  sanitizeUser,
+  getInitials,
+} from "./utils/session.js";
+import { sendJson, sendRedirect, readRequestBody } from "./utils/http.js";
+import {
+  createId,
+  parseGitHubPullUrl,
+  summarizeGithubFiles,
+  extractReviewMeta,
+  mergeGitHubIntoInput,
+} from "./utils/helpers.js";
 
 dotenv.config({ quiet: true });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, "public");
-const dataDir = path.join(__dirname, "data");
-const storePath = path.join(dataDir, "store.json");
 const port = Number(process.env.PORT || 3000);
-const sessionSecret = process.env.SESSION_SECRET || "local-dev-session-secret";
 const githubToken = process.env.GITHUB_TOKEN || "";
 const auth0Domain = process.env.AUTH0_DOMAIN || "";
 const auth0ClientId = process.env.AUTH0_CLIENT_ID || "";
@@ -36,200 +49,7 @@ const mimeTypes = {
   ".json": "application/json; charset=utf-8",
 };
 
-const sessions = new Map();
 const auth0States = new Map();
-
-async function ensureStore() {
-  await mkdir(dataDir, { recursive: true });
-
-  try {
-    await access(storePath);
-  } catch {
-    await writeFile(
-      storePath,
-      JSON.stringify({ users: [], reviews: [] }, null, 2),
-      "utf8",
-    );
-  }
-}
-
-async function readStore() {
-  await ensureStore();
-  const raw = await readFile(storePath, "utf8");
-  return JSON.parse(raw);
-}
-
-async function writeStore(store) {
-  await writeFile(storePath, JSON.stringify(store, null, 2), "utf8");
-}
-
-function sendJson(response, statusCode, data) {
-  response.writeHead(statusCode, {
-    "Content-Type": "application/json; charset=utf-8",
-  });
-  response.end(JSON.stringify(data));
-}
-
-function sendRedirect(response, location) {
-  response.writeHead(302, { Location: location });
-  response.end();
-}
-
-function parseCookies(request) {
-  const cookieHeader = request.headers.cookie || "";
-  const cookies = {};
-
-  for (const part of cookieHeader.split(";")) {
-    const [key, ...rest] = part.trim().split("=");
-    if (!key) {
-      continue;
-    }
-    cookies[key] = decodeURIComponent(rest.join("="));
-  }
-
-  return cookies;
-}
-
-function signValue(value) {
-  return createHmac("sha256", sessionSecret).update(value).digest("hex");
-}
-
-function setSessionCookie(response, sessionId) {
-  const signed = `${sessionId}.${signValue(sessionId)}`;
-  response.setHeader(
-    "Set-Cookie",
-    `pr_review_session=${encodeURIComponent(signed)}; HttpOnly; Path=/; SameSite=Lax; Max-Age=604800`,
-  );
-}
-
-function clearSessionCookie(response) {
-  response.setHeader(
-    "Set-Cookie",
-    "pr_review_session=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0",
-  );
-}
-
-function getVerifiedSessionId(request) {
-  const cookies = parseCookies(request);
-  const raw = cookies.pr_review_session;
-
-  if (!raw) {
-    return null;
-  }
-
-  const [sessionId, signature] = raw.split(".");
-  if (!sessionId || !signature) {
-    return null;
-  }
-
-  const expected = signValue(sessionId);
-  const actualBuffer = Buffer.from(signature);
-  const expectedBuffer = Buffer.from(expected);
-
-  if (
-    actualBuffer.length !== expectedBuffer.length ||
-    !timingSafeEqual(actualBuffer, expectedBuffer)
-  ) {
-    return null;
-  }
-
-  return sessionId;
-}
-
-async function getAuthenticatedUser(request) {
-  const sessionId = getVerifiedSessionId(request);
-
-  if (!sessionId) {
-    return null;
-  }
-
-  const session = sessions.get(sessionId);
-  if (!session) {
-    return null;
-  }
-
-  const store = await readStore();
-  const user = store.users.find((entry) => entry.id === session.userId);
-
-  if (!user) {
-    sessions.delete(sessionId);
-    return null;
-  }
-
-  return sanitizeUser(user);
-}
-
-function sanitizeUser(user) {
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    authProvider: user.authProvider,
-    avatarUrl: user.avatarUrl || "",
-    initials: getInitials(user.name || user.email),
-  };
-}
-
-function getInitials(value) {
-  return value
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() || "")
-    .join("") || "U";
-}
-
-function hashPassword(password) {
-  const salt = randomBytes(16).toString("hex");
-  const hash = scryptSync(password, salt, 64).toString("hex");
-  return `${salt}:${hash}`;
-}
-
-function verifyPassword(password, stored) {
-  const [salt, existingHash] = stored.split(":");
-  const computed = scryptSync(password, salt, 64).toString("hex");
-  return timingSafeEqual(Buffer.from(existingHash), Buffer.from(computed));
-}
-
-function createId(prefix) {
-  return `${prefix}_${randomBytes(8).toString("hex")}`;
-}
-
-function createSession(response, userId) {
-  const sessionId = createId("sess");
-  sessions.set(sessionId, {
-    userId,
-    createdAt: new Date().toISOString(),
-  });
-  setSessionCookie(response, sessionId);
-}
-
-function parseGitHubPullUrl(prUrl) {
-  try {
-    const url = new URL(prUrl);
-    if (url.hostname !== "github.com") {
-      return null;
-    }
-
-    const parts = url.pathname.split("/").filter(Boolean);
-    if (parts.length < 4 || parts[2] !== "pull") {
-      return null;
-    }
-
-    const pullNumber = Number(parts[3]);
-    if (!pullNumber) {
-      return null;
-    }
-
-    return {
-      owner: parts[0],
-      repo: parts[1],
-      pullNumber,
-    };
-  } catch {
-    return null;
-  }
-}
 
 async function githubRequest(pathname, options = {}) {
   if (!githubToken) {
@@ -252,21 +72,6 @@ async function githubRequest(pathname, options = {}) {
   }
 
   return data;
-}
-
-function summarizeGithubFiles(files) {
-  return files
-    .slice(0, 12)
-    .map((file) => {
-      const patchPreview = (file.patch || "").slice(0, 1200);
-      return [
-        `File: ${file.filename}`,
-        `Status: ${file.status}`,
-        `Additions: ${file.additions}, Deletions: ${file.deletions}`,
-        patchPreview ? `Patch:\n${patchPreview}` : "Patch: Not available",
-      ].join("\n");
-    })
-    .join("\n\n");
 }
 
 async function fetchGitHubPullRequest(prUrl) {
@@ -302,20 +107,6 @@ async function fetchGitHubPullRequest(prUrl) {
   };
 }
 
-function mergeGitHubIntoInput(input, githubPr) {
-  return {
-    ...input,
-    prText: [
-      githubPr.title ? `GitHub PR Title:\n${githubPr.title}` : "",
-      githubPr.body ? `GitHub PR Description:\n${githubPr.body}` : "",
-      githubPr.filesSummary ? `GitHub Changed Files:\n${githubPr.filesSummary}` : "",
-      input.prText ? `User PR Notes:\n${input.prText}` : "",
-    ]
-      .filter(Boolean)
-      .join("\n\n"),
-  };
-}
-
 async function postGitHubComment(prUrl, body) {
   const parsed = parseGitHubPullUrl(prUrl);
   if (!parsed) {
@@ -332,33 +123,6 @@ async function postGitHubComment(prUrl, body) {
       body: JSON.stringify({ body }),
     },
   );
-}
-
-async function readRequestBody(request) {
-  const chunks = [];
-
-  for await (const chunk of request) {
-    chunks.push(chunk);
-  }
-
-  return Buffer.concat(chunks).toString("utf8");
-}
-
-function extractReviewMeta(review, input) {
-  const ratingMatch = review.match(/## Rating\s+(.+)/i);
-  const summaryMatch = review.match(/## Summary\s+([\s\S]*?)(?:##|$)/i);
-
-  return {
-    rating: ratingMatch ? ratingMatch[1].trim() : "No rating",
-    summary: summaryMatch
-      ? summaryMatch[1].trim().replace(/\s+/g, " ").slice(0, 180)
-      : "Saved review",
-    label:
-      input.prUrl ||
-      input.issueUrl ||
-      input.prText.split("\n").find(Boolean) ||
-      "PR review",
-  };
 }
 
 async function handleSignup(request, response) {

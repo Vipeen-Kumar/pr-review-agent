@@ -262,6 +262,38 @@
         "htmlUrl": "https://github.com/vacanza/holidays/pull/3426"
       },
       "githubCommentUrl": ""
+    },
+    {
+      "id": "review_9a424a2cda050cc8",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-07-25T06:21:38.068Z",
+      "input": {
+        "issueUrl": "https://github.com/learning-unlimited/ESP-Website/issues/5261",
+        "issueText": "",
+        "prUrl": "https://github.com/learning-unlimited/ESP-Website/pull/5888",
+        "prText": "",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n8/10 - High confidence review as the key template diffs are provided and easy to analyze for correctness.\n\n## Summary\nGitHub PR Title: Refactor: Replace Hardcoded URLs with Django Template Tags (Batch 3 - Final Templates) (#5322)\n\n## Key Observations\n- The PR description explains the intended fix in a clear and reviewer-friendly way.\n\n## Potential Issues / Risks\n- Implementation details should still be checked against the actual changed code before merging.\n\n## Suggestions / Improvements\n- Add a short testing note so reviewers can verify the behavior quickly.\n- Keep the PR summary tightly focused on the bug, fix, and expected impact.\n\n## Better PR\nTitle\nFix issue described in the linked context\n\nWhat changed\nGitHub PR Title: Refactor: Replace Hardcoded URLs with Django Template Tags (Batch 3 - Final Templates) (#5322)\n\nWhy\nGitHub PR Title: Refactor: Replace Hardcoded URLs with Django Template Tags (Batch 3 - Final Templates) (#5322)\n\nTesting\nManually verified the described behavior and confirmed the intended fix path.",
+      "meta": {
+        "rating": "8/10 - High confidence review as the key template diffs are provided and easy to analyze for correctness.",
+        "summary": "GitHub PR Title: Refactor: Replace Hardcoded URLs with Django Template Tags (Batch 3 - Final Templates) (#5322)",
+        "label": "https://github.com/learning-unlimited/ESP-Website/pull/5888"
+      },
+      "githubPr": {
+        "title": "Refactor: Replace Hardcoded URLs with Django Template Tags (Batch 3 - Final Templates) (#5322)",
+        "author": "Janvi-kapoor",
+        "changedFiles": 44,
+        "additions": 86,
+        "deletions": 86,
+        "headBranch": "refactor-urls-batch-3",
+        "baseBranch": "main",
+        "htmlUrl": "https://github.com/learning-unlimited/ESP-Website/pull/5888"
+      },
+      "githubCommentUrl": ""
     }
   ]
 }
