@@ -201,15 +201,15 @@ SESSION_SECRET=your-secret-key
 
 # Gemini API
 GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-1.5-flash
+GEMINI_MODEL=gemini-3.6-flash
 
-# Auth0 (optional - required for Google OAuth)
+# Auth0 (required for Google OAuth)
 AUTH0_DOMAIN=your-auth0-domain.auth0.com
 AUTH0_CLIENT_ID=your_client_id
 AUTH0_CLIENT_SECRET=your_client_secret
 AUTH0_CALLBACK_URL=http://localhost:3000/auth/auth0/callback
 
-# GitHub (optional - required for PR fetch and comments)
+# GitHub (required for PR fetch and comments)
 GITHUB_TOKEN=your_github_token
 
 # Logging
