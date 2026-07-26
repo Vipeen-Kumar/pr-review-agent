@@ -1,6 +1,9 @@
-import { sendJson, readRequestBody } from "../utils/http.js";
+import { readRequestBody } from "../utils/http.js";
 import { getAuthenticatedUser } from "../utils/session.js";
 import * as reviewService from "../services/reviewService.js";
+import { ok, badRequest, unauthorized } from "../utils/response.js";
+import { validateReview } from "../utils/validators.js";
+import { info, error as logError } from "../utils/logger.js";
 
 /**
  * Review Controller
@@ -14,16 +17,22 @@ async function generateReview(request, response) {
   const user = await getAuthenticatedUser(request);
 
   if (!user) {
-    sendJson(response, 401, { error: "Please log in to create and save reviews." });
+    unauthorized(response, "Please log in to create and save reviews.");
     return;
   }
 
   try {
     const body = JSON.parse((await readRequestBody(request)) || "{}");
-    const result = await reviewService.generateAndSaveReview(user.id, body);
-    sendJson(response, 200, result);
-  } catch (error) {
-    sendJson(response, 400, { error: error.message || "Unable to review this submission." });
+    const validated = validateReview(body);
+    
+    info("Review generation started", { userId: user.id, prUrl: validated.prUrl });
+    const result = await reviewService.generateAndSaveReview(user.id, validated);
+    
+    info("Review generated successfully", { userId: user.id, reviewId: result.reviewRecord?.id });
+    ok(response, result);
+  } catch (err) {
+    logError("Review generation failed", err);
+    badRequest(response, err.message || "Unable to review this submission.");
   }
 }
 

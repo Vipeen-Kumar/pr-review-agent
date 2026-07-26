@@ -268,9 +268,11 @@ function renderHistory() {
 async function refreshSession() {
   const response = await fetch("/api/me");
   const data = await response.json();
+  
   state.currentUser = data.user;
   state.reviews = data.reviews || [];
   state.googleAuthEnabled = Boolean(data.googleAuthEnabled);
+  
   state.githubIntegrationEnabled = Boolean(data.githubIntegrationEnabled);
   googleLogin.disabled = !state.googleAuthEnabled;
   googleSignup.disabled = !state.googleAuthEnabled;
@@ -374,8 +376,12 @@ async function fetchPullRequestDetails() {
 
 fetchPrButton.addEventListener("click", fetchPullRequestDetails);
 
-googleLogin.addEventListener("click", startGoogleAuth);
-googleSignup.addEventListener("click", startGoogleAuth);
+googleLogin.addEventListener("click", () => {
+  startGoogleAuth();
+});
+googleSignup.addEventListener("click", () => {
+  startGoogleAuth();
+});
 
 logoutButton.addEventListener("click", async () => {
   await fetch("/api/logout", { method: "POST" });

@@ -317,6 +317,38 @@
       },
       "githubPr": null,
       "githubCommentUrl": ""
+    },
+    {
+      "id": "review_d7bd9ab900876f87",
+      "userId": "user_e4d33e462c3b3447",
+      "createdAt": "2026-07-26T06:41:51.465Z",
+      "input": {
+        "issueUrl": "https://github.com/learning-unlimited/ESP-Website/issues/3780",
+        "issueText": "",
+        "prUrl": "https://github.com/learning-unlimited/ESP-Website/pull/5894",
+        "prText": "",
+        "previousCode": "",
+        "currentCode": "",
+        "companyName": "Not specified",
+        "companyGuidelines": ""
+      },
+      "review": "## Rating\n9/10 — High confidence review based on clear PR context, valid `codecov.yml` diff, and well-structured documentation additions.\n\n## Summary\nThis PR enforces concrete Codecov status checks (70% overall target, 60% patch target) to prevent untested code from landing in `main`. It also introduces `docs/dev/testing.rst` to document ESP test fixtures, pytest commands, and framework edge cases.\n\n## Key Observations\n- **Codecov Guardrails:** Switching patch coverage from `no` to a `60%` target actively prevents new PRs from introducing untested lines.\n- **Actionable Documentation:** The testing guide addresses tricky, ESP-specific test behavior (e.g., `@needs_admin` returning 200 with an error template instead of 403).\n\n## Potential Issues / Risks\n- **CI Friction on Small PRs:** A strictly enforced 60% patch target may cause CI failures on small refactors or multi-line bug fixes that touch mostly uncovered edge cases.\n\n## Suggestions / Improvements\n- **Local Coverage Workflow:** Include a quick snippet in `docs/dev/testing.rst` explaining how to run pytest with local coverage flags (`pytest --cov=esp`) so authors can verify patch coverage before pushing.\n\n## Missing Information\n- None; the PR context and file diff provide sufficient detail for full review.\n\n## Better PR\n**Title:** Enforce Codecov coverage targets and add developer testing guide\n\n**What changed:**\n- Configured explicit Codecov thresholds in `codecov.yml` (`project.target: 70%`, `patch.target: 60%`).\n- Added `docs/dev/testing.rst` covering pytest filtering, test fixtures, factories, and framework pitfalls.\n\n**Why:**\n- `codecov.yml` previously allowed untracked patch additions.\n- Contributors lacked explicit guidelines for writing tests against ESP infrastructure.\n\n**Testing:**\n- Validated YAML parsing for `codecov.yml`.\n- Verified Sphinx/docutils rendering for `docs/dev/testing.rst`.",
+      "meta": {
+        "rating": "9/10 — High confidence review based on clear PR context, valid `codecov.yml` diff, and well-structured documentation additions.",
+        "summary": "This PR enforces concrete Codecov status checks (70% overall target, 60% patch target) to prevent untested code from landing in `main`. It also introduces `docs/dev/testing.rst` to",
+        "label": "https://github.com/learning-unlimited/ESP-Website/pull/5894"
+      },
+      "githubPr": {
+        "title": "Week 7: Enforce Codecov coverage targets and document how to write tests",
+        "author": "vipulpandey21",
+        "changedFiles": 2,
+        "additions": 363,
+        "deletions": 1,
+        "headBranch": "config/codecov-threshold-docs",
+        "baseBranch": "main",
+        "htmlUrl": "https://github.com/learning-unlimited/ESP-Website/pull/5894"
+      },
+      "githubCommentUrl": ""
     }
   ]
 }

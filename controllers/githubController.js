@@ -1,6 +1,9 @@
-import { sendJson, readRequestBody } from "../utils/http.js";
+import { readRequestBody } from "../utils/http.js";
 import { getAuthenticatedUser } from "../utils/session.js";
 import * as githubService from "../services/githubService.js";
+import { ok, badRequest, unauthorized } from "../utils/response.js";
+import { validateGitHubUrl } from "../utils/validators.js";
+import { info, error as logError } from "../utils/logger.js";
 
 /**
  * GitHub Controller
@@ -13,16 +16,22 @@ import * as githubService from "../services/githubService.js";
 async function fetchPullRequest(request, response) {
   const user = await getAuthenticatedUser(request);
   if (!user) {
-    sendJson(response, 401, { error: "Please log in to fetch pull requests." });
+    unauthorized(response, "Please log in to fetch pull requests.");
     return;
   }
 
   try {
     const body = JSON.parse((await readRequestBody(request)) || "{}");
+    const parsed = validateGitHubUrl(body.prUrl || "");
+    
+    info("Fetching GitHub PR", { userId: user.id, owner: parsed.owner, repo: parsed.repo, pr: parsed.pullNumber });
     const githubPr = await githubService.fetchPullRequest(body.prUrl || "");
-    sendJson(response, 200, { githubPr });
-  } catch (error) {
-    sendJson(response, 400, { error: error.message || "Unable to fetch this PR." });
+    
+    info("GitHub PR fetched successfully", { userId: user.id });
+    ok(response, { githubPr });
+  } catch (err) {
+    logError("GitHub PR fetch failed", err);
+    badRequest(response, err.message || "Unable to fetch this PR.");
   }
 }
 

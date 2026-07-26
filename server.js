@@ -1,11 +1,12 @@
+// CRITICAL: Import env loader FIRST to initialize dotenv before any other module imports
+import "./env-loader.js";
+
+// Now import other modules
 import { createServer } from "node:http";
-import dotenv from "dotenv";
-
-dotenv.config({ quiet: true });
-
 import { handleRoutes } from "./routes/index.js";
-
-const port = Number(process.env.PORT || 3000);
+import { methodNotAllowed } from "./utils/response.js";
+import config from "./config/env.js";
+import { info } from "./utils/logger.js";
 
 const server = createServer(async (request, response) => {
   const url = new URL(request.url || "/", `http://${request.headers.host}`);
@@ -13,13 +14,10 @@ const server = createServer(async (request, response) => {
   const handled = await handleRoutes(request, response, url);
 
   if (!handled) {
-    response.writeHead(405, {
-      "Content-Type": "text/plain; charset=utf-8",
-    });
-    response.end("Method not allowed");
+    methodNotAllowed(response);
   }
 });
 
-server.listen(port, () => {
-  console.log(`PR Review Agent UI running at http://localhost:${port}`);
+server.listen(config.port, () => {
+  info(`PR Review Agent UI running at http://localhost:${config.port}`);
 });

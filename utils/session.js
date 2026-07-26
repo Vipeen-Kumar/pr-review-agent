@@ -1,11 +1,12 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { readStore } from "../storage/store.js";
+import config from "../config/env.js";
+import { COOKIE_CONFIG } from "../config/constants.js";
 
 const sessions = new Map();
-const sessionSecret = process.env.SESSION_SECRET || "local-dev-session-secret";
 
 function signValue(value) {
-  return createHmac("sha256", sessionSecret).update(value).digest("hex");
+  return createHmac("sha256", config.sessionSecret).update(value).digest("hex");
 }
 
 function verifySignedValue(sessionId, signature) {
@@ -27,14 +28,14 @@ function setSessionCookie(response, sessionId) {
   const signed = `${sessionId}.${signValue(sessionId)}`;
   response.setHeader(
     "Set-Cookie",
-    `pr_review_session=${encodeURIComponent(signed)}; HttpOnly; Path=/; SameSite=Lax; Max-Age=604800`,
+    `${COOKIE_CONFIG.SESSION_NAME}=${encodeURIComponent(signed)}; HttpOnly; Path=${COOKIE_CONFIG.PATH}; SameSite=${COOKIE_CONFIG.SAME_SITE}; Max-Age=${COOKIE_CONFIG.MAX_AGE}`,
   );
 }
 
 function clearSessionCookie(response) {
   response.setHeader(
     "Set-Cookie",
-    "pr_review_session=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0",
+    `${COOKIE_CONFIG.SESSION_NAME}=; HttpOnly; Path=${COOKIE_CONFIG.PATH}; SameSite=${COOKIE_CONFIG.SAME_SITE}; Max-Age=0`,
   );
 }
 
@@ -55,7 +56,7 @@ function parseCookies(request) {
 
 function getVerifiedSessionId(request) {
   const cookies = parseCookies(request);
-  const raw = cookies.pr_review_session;
+  const raw = cookies[COOKIE_CONFIG.SESSION_NAME];
 
   if (!raw) {
     return null;
