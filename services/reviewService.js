@@ -1,4 +1,4 @@
-import { readStore, writeStore } from "../storage/store.js";
+import * as reviewRepository from "../repositories/reviewRepository.js";
 import { createId, extractReviewMeta, mergeGitHubIntoInput } from "../utils/helpers.js";
 import { fetchPullRequest, postComment } from "./githubService.js";
 import { generateReview } from "./geminiService.js";
@@ -7,7 +7,7 @@ import { generateReview } from "./geminiService.js";
  * Review Service
  * 
  * Orchestrates the review generation process.
- * Coordinates between GitHub, Gemini, and storage layers.
+ * Coordinates between GitHub, Gemini, and repository layers.
  * Does not know about HTTP requests or responses.
  */
 
@@ -44,7 +44,6 @@ async function generateAndSaveReview(userId, body) {
   }
 
   const meta = extractReviewMeta(review, input);
-  const store = await readStore();
   const record = {
     id: createId("review"),
     userId,
@@ -67,8 +66,7 @@ async function generateAndSaveReview(userId, body) {
     githubCommentUrl: githubComment?.html_url || "",
   };
 
-  store.reviews.push(record);
-  await writeStore(store);
+  await reviewRepository.saveReview(record);
 
   return {
     review,

@@ -1,4 +1,5 @@
-import { readStore, writeStore } from "../storage/store.js";
+import * as userRepository from "../repositories/userRepository.js";
+import * as reviewRepository from "../repositories/reviewRepository.js";
 import { hashPassword, verifyPassword } from "../utils/password.js";
 import { createId, sanitizeUser } from "../utils/helpers.js";
 
@@ -6,18 +7,17 @@ import { createId, sanitizeUser } from "../utils/helpers.js";
  * Auth Service
  * 
  * Handles all user authentication and account management logic.
+ * Orchestrates repository calls with business logic.
  * Does not know about HTTP requests or responses.
  * Returns plain objects or throws errors.
  */
 
 async function findUserByEmail(email) {
-  const store = await readStore();
-  return store.users.find((user) => user.email === email.toLowerCase()) || null;
+  return userRepository.findUserByEmail(email);
 }
 
 async function findUserById(userId) {
-  const store = await readStore();
-  return store.users.find((user) => user.id === userId) || null;
+  return userRepository.findUserById(userId);
 }
 
 async function createUser(name, email, password) {
@@ -44,10 +44,7 @@ async function createUser(name, email, password) {
     createdAt: new Date().toISOString(),
   };
 
-  const store = await readStore();
-  store.users.push(user);
-  await writeStore(store);
-
+  await userRepository.createUser(user);
   return sanitizeUser(user);
 }
 
@@ -65,10 +62,7 @@ async function verifyUser(email, password) {
 }
 
 async function findOrCreateGoogleUser(auth0User) {
-  const store = await readStore();
-  let user = store.users.find(
-    (entry) => entry.auth0Sub === auth0User.sub || entry.email === auth0User.email,
-  );
+  let user = await userRepository.findUserByEmail(auth0User.email);
 
   if (!user) {
     user = {
@@ -80,23 +74,22 @@ async function findOrCreateGoogleUser(auth0User) {
       auth0Sub: auth0User.sub,
       createdAt: new Date().toISOString(),
     };
-    store.users.push(user);
+    await userRepository.createUser(user);
   } else {
-    user.name = auth0User.name || user.name;
-    user.avatarUrl = auth0User.picture || user.avatarUrl || "";
-    user.auth0Sub = auth0User.sub || user.auth0Sub;
-    user.authProvider = "google";
+    const updates = {
+      name: auth0User.name || user.name,
+      avatarUrl: auth0User.picture || user.avatarUrl || "",
+      auth0Sub: auth0User.sub || user.auth0Sub,
+      authProvider: "google",
+    };
+    user = await userRepository.updateUser(user.id, updates);
   }
 
-  await writeStore(store);
   return sanitizeUser(user);
 }
 
 async function getUserReviews(userId) {
-  const store = await readStore();
-  return store.reviews
-    .filter((review) => review.userId === userId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return reviewRepository.findReviewsByUserId(userId);
 }
 
 export {
@@ -106,4 +99,4 @@ export {
   verifyUser,
   findOrCreateGoogleUser,
   getUserReviews,
-};
+}
