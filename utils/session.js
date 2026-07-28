@@ -1,5 +1,5 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
-import { readStore } from "../storage/store.js";
+import * as userRepository from "../repositories/userRepository.js";
 import config from "../config/env.js";
 import { COOKIE_CONFIG } from "../config/constants.js";
 
@@ -95,8 +95,7 @@ async function getAuthenticatedUser(request) {
     return null;
   }
 
-  const store = await readStore();
-  const user = store.users.find((entry) => entry.id === session.userId);
+  const user = await userRepository.findUserById(session.userId);
 
   if (!user) {
     sessions.delete(sessionId);

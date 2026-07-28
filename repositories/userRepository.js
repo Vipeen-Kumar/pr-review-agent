@@ -1,4 +1,4 @@
-import { readStore, writeStore } from "../storage/store.js";
+import User from "../models/User.js";
 
 /**
  * User Repository
@@ -6,46 +6,37 @@ import { readStore, writeStore } from "../storage/store.js";
  * Handles all user-related persistence operations.
  * Pure CRUD layer - no business logic.
  * Data access abstraction for users collection.
+ * Uses Mongoose for MongoDB operations.
  */
 
 async function findUserByEmail(email) {
-  const store = await readStore();
-  return store.users.find((user) => user.email === email.toLowerCase()) || null;
+  const user = await User.findOne({ email: email.toLowerCase() }).lean();
+  return user || null;
 }
 
 async function findUserById(userId) {
-  const store = await readStore();
-  return store.users.find((user) => user.id === userId) || null;
+  const user = await User.findOne({ id: userId }).lean();
+  return user || null;
 }
 
 async function createUser(user) {
-  const store = await readStore();
-  store.users.push(user);
-  await writeStore(store);
-  return user;
+  const newUser = new User(user);
+  const saved = await newUser.save();
+  return saved.toObject();
 }
 
 async function updateUser(userId, updates) {
-  const store = await readStore();
-  const userIndex = store.users.findIndex((user) => user.id === userId);
-  
-  if (userIndex === -1) {
-    return null;
-  }
-
-  const updatedUser = {
-    ...store.users[userIndex],
-    ...updates,
-  };
-
-  store.users[userIndex] = updatedUser;
-  await writeStore(store);
-  return updatedUser;
+  const updated = await User.findOneAndUpdate(
+    { id: userId },
+    updates,
+    { new: true, runValidators: true }
+  ).lean();
+  return updated || null;
 }
 
 async function listUsers() {
-  const store = await readStore();
-  return store.users;
+  const users = await User.find({}).lean();
+  return users;
 }
 
 export {

@@ -1,4 +1,4 @@
-import { readStore, writeStore } from "../storage/store.js";
+import Review from "../models/Review.js";
 
 /**
  * Review Repository
@@ -6,48 +6,39 @@ import { readStore, writeStore } from "../storage/store.js";
  * Handles all review-related persistence operations.
  * Pure CRUD layer - no business logic.
  * Data access abstraction for reviews collection.
+ * Uses Mongoose for MongoDB operations.
  */
 
 async function saveReview(review) {
-  const store = await readStore();
-  store.reviews.push(review);
-  await writeStore(store);
-  return review;
+  const newReview = new Review(review);
+  const saved = await newReview.save();
+  return saved.toObject();
 }
 
 async function findReviewById(reviewId) {
-  const store = await readStore();
-  return store.reviews.find((review) => review.id === reviewId) || null;
+  const review = await Review.findOne({ id: reviewId }).lean();
+  return review || null;
 }
 
 async function findReviewsByUserId(userId) {
-  const store = await readStore();
-  return store.reviews
-    .filter((review) => review.userId === userId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const reviews = await Review.find({ userId })
+    .sort({ createdAt: -1 })
+    .lean();
+  return reviews;
 }
 
 async function listReviews() {
-  const store = await readStore();
-  return store.reviews;
+  const reviews = await Review.find({}).lean();
+  return reviews;
 }
 
 async function updateReview(reviewId, updates) {
-  const store = await readStore();
-  const reviewIndex = store.reviews.findIndex((review) => review.id === reviewId);
-  
-  if (reviewIndex === -1) {
-    return null;
-  }
-
-  const updatedReview = {
-    ...store.reviews[reviewIndex],
-    ...updates,
-  };
-
-  store.reviews[reviewIndex] = updatedReview;
-  await writeStore(store);
-  return updatedReview;
+  const updated = await Review.findOneAndUpdate(
+    { id: reviewId },
+    updates,
+    { new: true, runValidators: true }
+  ).lean();
+  return updated || null;
 }
 
 export {
