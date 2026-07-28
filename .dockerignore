@@ -1,0 +1,10 @@
+node_modules
+.git
+.env
+logs
+coverage
+tmp
+temp
+*.log
+*.tmp
+*.swp

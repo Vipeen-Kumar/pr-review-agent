@@ -195,6 +195,7 @@ Create or update `.env` with your configuration:
 ```env
 # Server
 PORT=3000
+MONGODB_URI=mongodb://localhost:27017/pr-review-agent
 
 # Session
 SESSION_SECRET=your-secret-key
@@ -217,12 +218,15 @@ LOG_LEVEL=info
 ```
 
 **Notes:**
+- `MONGODB_URI` points to your local MongoDB instance during development
 - `GEMINI_API_KEY` is required for review generation
 - `GEMINI_MODEL` can be changed to use different Gemini models
 - `SESSION_SECRET` signs login sessions (required)
 - Auth0 configuration enables Google login
 - GitHub token enables PR metadata fetching
 - `LOG_LEVEL` can be: debug, info, warn, error
+
+If you prefer a template, copy `.env.example` to `.env` and fill in the values you need.
 
 ## How To Run The Project
 
@@ -256,6 +260,61 @@ The app will show:
 - Final verdict (APPROVE or REQUEST CHANGES)
 
 Each review is saved to your account and shown in the history panel.
+
+## Running with Docker
+
+Prerequisites:
+
+- Docker Desktop
+
+The Docker setup runs the Node.js app and MongoDB together so any developer can start the full stack with one command.
+
+Commands:
+
+```bash
+docker compose up --build
+```
+
+Builds the app image, starts both services, and waits for MongoDB to pass its healthcheck before the app connects.
+
+```bash
+docker compose down
+```
+
+Stops and removes the containers while keeping the named MongoDB volume intact.
+
+```bash
+docker compose down -v
+```
+
+Stops the stack and removes the containers plus the named volume, which resets the database.
+
+Architecture:
+
+```text
+Browser
+   │
+Node.js App
+   │
+MongoDB
+```
+
+How persistence works:
+
+MongoDB stores data in a named Docker volume. That volume survives container restarts, so review history and user data remain available after `docker compose down` and `docker compose up`. Use `docker compose down -v` only when you want a clean database.
+
+Resetting the database:
+
+- Stop the stack and remove the volume with `docker compose down -v`
+- Start again with `docker compose up --build`
+
+Inspecting MongoDB from inside Docker:
+
+```bash
+docker exec -it mongo-pr-review mongosh
+```
+
+From the shell, you can inspect the app database with commands such as `show dbs`, `use pr-review-agent`, and `show collections`.
 
 ### Run interactive CLI mode
 

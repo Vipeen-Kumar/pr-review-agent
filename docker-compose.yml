@@ -1,0 +1,37 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo-pr-review
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pr-review-agent
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/pr-review-agent
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+
+volumes:
+  mongo-data:
