@@ -15,15 +15,15 @@
   <body data-theme="light">
     <div class="page-shell">
       <header class="hero">
-        <div>
+        <div class="hero-content">
           <p class="eyebrow">AI PR Review Workspace</p>
           <h1 class="hero-title">
             <span class="hero-title-line hero-title-primary">The home for every PR review.</span>
             <span class="hero-title-line hero-title-secondary">
               <span class="hero-title-muted">AI-powered reviews with</span>
-              <span class="hero-title-accent hero-title-history">searchable history</span>
+              <span class="hero-highlight hero-highlight-history">searchable history</span>
               <span class="hero-title-muted">and</span>
-              <span class="hero-title-accent hero-title-knowledge">team knowledge</span>
+              <span class="hero-highlight hero-highlight-knowledge">team knowledge</span>
             </span>
           </h1>
           <p class="hero-copy">
@@ -32,26 +32,32 @@
           </p>
         </div>
 
-        <div class="hero-actions">
-          <button id="historyToggle" class="theme-toggle" type="button" aria-label="Open review history">
-            <span class="menu-icon" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
-          </button>
+        <div class="hero-aside">
+          <div class="hero-actions">
+            <button id="historyToggle" class="theme-toggle" type="button" aria-label="Open review history">
+              <span class="menu-icon" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </button>
 
-          <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme">
-            <span id="themeIcon" class="theme-icon" aria-hidden="true">&#9790;</span>
-          </button>
+            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme">
+              <span id="themeIcon" class="theme-icon" aria-hidden="true">&#9790;</span>
+            </button>
 
-          <div id="profileCard" class="profile-card hidden">
-            <div id="profileAvatar" class="avatar"></div>
-            <div class="profile-copy">
-              <strong id="profileName"></strong>
-              <span id="profileEmail"></span>
+            <div id="profileCard" class="profile-card hidden">
+              <div id="profileAvatar" class="avatar"></div>
+              <div class="profile-copy">
+                <strong id="profileName"></strong>
+                <span id="profileEmail"></span>
+              </div>
+              <button id="logoutButton" class="ghost-button" type="button">Log out</button>
             </div>
-            <button id="logoutButton" class="ghost-button" type="button">Log out</button>
+          </div>
+
+          <div class="hero-visual" aria-hidden="true">
+            <canvas id="heroDotField" class="hero-dot-field"></canvas>
           </div>
         </div>
       </header>

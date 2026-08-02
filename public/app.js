@@ -30,6 +30,10 @@ const historyClose = document.getElementById("historyClose");
 const historyBackdrop = document.getElementById("historyBackdrop");
 const fetchFromGitHubCheckbox = document.getElementById("fetchFromGitHub");
 const postCommentCheckbox = document.getElementById("postComment");
+const heroSection = document.querySelector(".hero");
+const heroDotFieldCanvas = document.getElementById("heroDotField");
+
+import { InteractiveDotField } from "/interactive-dot-field.js";
 
 const state = {
   currentUser: null,
@@ -202,6 +206,64 @@ function renderGitHubMeta(pr) {
 function setHistoryDrawer(open) {
   historyDrawer.classList.toggle("hidden", !open);
   historyBackdrop.classList.toggle("hidden", !open);
+}
+
+function activateHeroAnimation() {
+  if (!heroSection || heroSection.dataset.heroAnimated === "true") {
+    return;
+  }
+
+  heroSection.dataset.heroAnimated = "true";
+  heroSection.classList.add("hero-animate");
+}
+
+function setupHeroAnimation() {
+  if (!heroSection) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    activateHeroAnimation();
+    return;
+  }
+
+  const heroObserver = new IntersectionObserver(
+    (entries, observer) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) {
+          continue;
+        }
+
+        activateHeroAnimation();
+        observer.disconnect();
+        break;
+      }
+    },
+    {
+      threshold: 0.2,
+      rootMargin: "0px 0px -12% 0px",
+    },
+  );
+
+  heroObserver.observe(heroSection);
+}
+
+function setupHeroDotField() {
+  if (!heroDotFieldCanvas) {
+    return;
+  }
+
+  new InteractiveDotField(heroDotFieldCanvas, {
+    dotCount: 480,
+    dotColor: "#3B82F6",
+    noiseSpeed: 0.18,
+    noiseAmplitude: 10,
+    interactionRadius: 160,
+    interactionStrength: 0.22,
+    glowIntensity: 0.28,
+    animationSpeed: 0.7,
+  });
 }
 
 function renderProfile() {
@@ -472,5 +534,8 @@ if (authStatus === "google_not_configured") {
 if (authStatus === "google_failed") {
   setAuthMessage("Google login through Auth0 could not be completed. Please try again.");
 }
+
+setupHeroAnimation();
+setupHeroDotField();
 
 await refreshSession();
