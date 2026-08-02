@@ -113,14 +113,63 @@ body {
   line-height: 1.3;
 }
 
-.hero h1 {
-  max-width: 900px;
+.hero-title {
+  max-width: 64rem;
   font-family: var(--font-display);
-  font-size: clamp(2.75rem, 6.5vw, 5.5rem);
+  font-size: clamp(2.6rem, 5.3vw, 5.2rem);
   font-weight: 900;
-  line-height: 0.92;
-  letter-spacing: -0.04em;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
   color: var(--text);
+}
+
+.hero-title-line {
+  display: block;
+}
+
+.hero-title-secondary {
+  margin-top: 0.16em;
+}
+
+.hero-title-muted,
+.hero-title-accent {
+  display: inline;
+}
+
+.hero-title-muted {
+  color: inherit;
+}
+
+body[data-theme="light"] .hero-title-primary {
+  color: #111111;
+}
+
+body[data-theme="light"] .hero-title-muted {
+  color: #4b5563;
+}
+
+body[data-theme="light"] .hero-title-history {
+  color: #4f46e5;
+}
+
+body[data-theme="light"] .hero-title-knowledge {
+  color: #059669;
+}
+
+body[data-theme="dark"] .hero-title-primary {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .hero-title-muted {
+  color: #cbd5e1;
+}
+
+body[data-theme="dark"] .hero-title-history {
+  color: #fbbf24;
+}
+
+body[data-theme="dark"] .hero-title-knowledge {
+  color: #34d399;
 }
 
 .hero-copy,
@@ -132,11 +181,11 @@ body {
 }
 
 .hero-copy {
-  max-width: 640px;
-  margin-top: 22px;
-  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
-  line-height: 1.55;
-  letter-spacing: -0.01em;
+  max-width: 42rem;
+  margin-top: 20px;
+  font-size: clamp(1rem, 1.15vw, 1.15rem);
+  line-height: 1.65;
+  letter-spacing: -0.02em;
 }
 
 .helper-text {
@@ -637,6 +686,16 @@ body[data-theme="light"] .history-drawer {
 @media (max-width: 760px) {
   .page-shell {
     padding: 20px 14px 30px;
+  }
+
+  .hero-title {
+    font-size: clamp(2.25rem, 11vw, 3.6rem);
+  }
+
+  .hero-copy {
+    margin-top: 16px;
+    font-size: 0.95rem;
+    line-height: 1.62;
   }
 
   .hero,
