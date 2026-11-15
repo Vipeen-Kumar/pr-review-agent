@@ -309,6 +309,16 @@ body[data-theme="dark"] .hero-visual {
   font-size: 0.875rem;
   line-height: 1.55;
   letter-spacing: -0.005em;
+  margin-top: 12px;
+}
+
+.checkbox-row + .helper-text {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(127, 127, 127, 0.08);
+  border-left: 3px solid var(--accent);
+  color: var(--text);
 }
 
 .auth-message {
@@ -478,6 +488,16 @@ textarea {
   margin-top: 2px;
 }
 
+.checkbox-field input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox-field:has(input:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .layout {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
@@ -541,6 +561,10 @@ textarea {
   border-radius: 999px;
   background: #ffffff;
   display: block;
+}
+
+body[data-theme="light"] .menu-icon span {
+  background: #1a1a1a;
 }
 
 .primary-button {

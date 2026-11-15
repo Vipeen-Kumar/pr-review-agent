@@ -271,6 +271,10 @@ function renderProfile() {
     profileCard.classList.add("hidden");
     authPanel.classList.remove("hidden");
     authGateText.textContent = "Login required to save reviews";
+    // Disable postComment checkbox when not logged in
+    postCommentCheckbox.disabled = true;
+    postCommentCheckbox.checked = false;
+    postCommentCheckbox.title = "You must be logged in to post comments to GitHub";
     return;
   }
 
@@ -279,6 +283,10 @@ function renderProfile() {
   authGateText.textContent = "Authenticated and saving review history";
   profileName.textContent = state.currentUser.name;
   profileEmail.textContent = state.currentUser.email;
+  
+  // Enable postComment checkbox when logged in
+  postCommentCheckbox.disabled = false;
+  postCommentCheckbox.title = "Post the generated review to GitHub as a comment";
 
   if (state.currentUser.avatarUrl) {
     profileAvatar.style.backgroundImage = `url("${state.currentUser.avatarUrl}")`;
@@ -453,6 +461,9 @@ logoutButton.addEventListener("click", async () => {
   renderHistory();
   setAuthMode("login");
   setHistoryDrawer(false);
+  // Disable postComment checkbox when logging out
+  postCommentCheckbox.disabled = true;
+  postCommentCheckbox.checked = false;
 });
 
 historyToggle.addEventListener("click", () => {
@@ -478,12 +489,22 @@ reviewForm.addEventListener("submit", async (event) => {
   }
 
   const formData = new FormData(reviewForm);
+  const postCommentChecked = Boolean(formData.get("postComment"));
+  
+  // Check if user is logged in before allowing GitHub comment posting
+  if (postCommentChecked && !state.currentUser) {
+    setAuthMessage("You must be logged in to post comments to GitHub.");
+    authPanel.classList.remove("hidden");
+    setAuthMode("login");
+    return;
+  }
+
   const payload = {
     companyName: formData.get("companyName")?.toString() || "",
     issueUrl: formData.get("issueUrl")?.toString() || "",
     prUrl: formData.get("prUrl")?.toString() || "",
     fetchFromGitHub: Boolean(formData.get("fetchFromGitHub")),
-    postComment: Boolean(formData.get("postComment")),
+    postComment: postCommentChecked,
   };
 
   statusBadge.textContent = "Reviewing";

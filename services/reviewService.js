@@ -24,7 +24,7 @@ function buildReviewInput(body) {
   };
 }
 
-async function generateAndSaveReview(userId, body) {
+async function generateAndSaveReview(userId, body, user = null) {
   const input = buildReviewInput(body);
 
   let githubPr = null;
@@ -37,10 +37,25 @@ async function generateAndSaveReview(userId, body) {
 
   let githubComment = null;
   if (body.postComment && input.prUrl) {
-    githubComment = await postComment(
-      input.prUrl,
-      `## Automated PR Review\n\n${review}`,
-    );
+    const userInfo = user ? `${user.name} (${user.email})` : "Unknown User";
+    const attributionMessage = `## Automated PR Review
+
+${review}
+
+---
+
+**ℹ️ About this review:**
+This AI-generated response was created by user: **${userInfo}**
+
+This review is from the PR Review Agent, a project created by **Vipeen Kumar**.
+
+- **GitHub:** https://github.com/Vipeen-Kumar
+- **Website:** Coming live soon
+- **Contact:** vipeenk023@gmail.com
+
+*For feedback or issues, please reach out to the creator.*`;
+
+    githubComment = await postComment(input.prUrl, attributionMessage);
   }
 
   const meta = extractReviewMeta(review, input);

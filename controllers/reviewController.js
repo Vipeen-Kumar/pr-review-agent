@@ -26,7 +26,7 @@ async function generateReview(request, response) {
     const validated = validateReview(body);
     
     info("Review generation started", { userId: user.id, prUrl: validated.prUrl });
-    const result = await reviewService.generateAndSaveReview(user.id, validated);
+    const result = await reviewService.generateAndSaveReview(user.id, validated, user);
     
     info("Review generated successfully", { userId: user.id, reviewId: result.reviewRecord?.id });
     ok(response, result);
