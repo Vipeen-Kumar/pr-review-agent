@@ -4,12 +4,11 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 
-RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev && npm cache clean --force
+RUN --mount=type=cache,target=/root/.npm npm ci && npm cache clean --force
 
 COPY env-loader.js ./
 COPY server.js ./
 COPY gemini.js ./
-COPY .env ./
 COPY config ./config
 COPY controllers ./controllers
 COPY models ./models
