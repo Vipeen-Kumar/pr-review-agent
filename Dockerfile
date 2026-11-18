@@ -9,6 +9,7 @@ RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev && npm cache clean --
 COPY env-loader.js ./
 COPY server.js ./
 COPY gemini.js ./
+COPY .env ./
 COPY config ./config
 COPY controllers ./controllers
 COPY models ./models
@@ -18,6 +19,7 @@ COPY services ./services
 COPY storage ./storage
 COPY utils ./utils
 COPY public ./public
+COPY scripts ./scripts
 
 ENV NODE_ENV=production
 ENV PORT=3000
