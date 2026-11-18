@@ -336,7 +336,7 @@ function renderHistory() {
 }
 
 async function refreshSession() {
-  const response = await fetch("/api/me");
+  const response = await fetch(`${window.API_URL}/api/me`);
   const data = await response.json();
   
   state.currentUser = data.user;
@@ -361,7 +361,7 @@ async function submitAuthForm(url, form) {
   const formData = new FormData(form);
   const payload = Object.fromEntries(formData.entries());
 
-  const response = await fetch(url, {
+  const response = await fetch(`${window.API_URL}${url}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -408,7 +408,7 @@ function startGoogleAuth() {
     return;
   }
 
-  window.location.href = "/auth/google/start";
+  window.location.href = `${window.API_URL}/auth/google/start`;
 }
 
 async function fetchPullRequestDetails() {
@@ -421,7 +421,7 @@ async function fetchPullRequestDetails() {
   setGitHubStatus("Fetching pull request details from GitHub...");
 
   try {
-    const response = await fetch("/api/github/fetch-pr", {
+    const response = await fetch(`${window.API_URL}/api/github/fetch-pr`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -454,7 +454,7 @@ googleSignup.addEventListener("click", () => {
 });
 
 logoutButton.addEventListener("click", async () => {
-  await fetch("/api/logout", { method: "POST" });
+  await fetch(`${window.API_URL}/api/logout`, { method: "POST" });
   state.currentUser = null;
   state.reviews = [];
   renderProfile();
@@ -514,7 +514,7 @@ reviewForm.addEventListener("submit", async (event) => {
   commentStatus.textContent = "";
 
   try {
-    const response = await fetch("/api/review", {
+    const response = await fetch(`${window.API_URL}/api/review`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

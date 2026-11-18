@@ -454,7 +454,15 @@ For detailed information, see:
 - `GET /app.js` - Serve frontend JavaScript
 - `GET /styles.css` - Serve frontend CSS
 
-## Notes
+## Ready to Deploy?
+
+Your app is **production-ready** and can be deployed to Render in ~15 minutes.
+
+### Quick Start
+👉 **See: [`DEPLOY_NOW.md`](./DEPLOY_NOW.md)** (5 simple steps)
+
+### Detailed Guide
+👉 **See: [`RENDER_DEPLOYMENT.md`](./RENDER_DEPLOYMENT.md)** (full reference)
 
 - The UI supports both light mode and dark mode (toggle in header)
 - The project reviews using URLs, pasted PR text, or both

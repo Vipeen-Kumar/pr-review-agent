@@ -23,6 +23,9 @@ function getEnv(key, defaultValue = undefined) {
 // Server configuration
 const PORT = Number(getEnv("PORT", "3000"));
 
+// Frontend configuration (for CORS)
+const FRONTEND_URL = getEnv("FRONTEND_URL", "http://localhost:3000");
+
 // Session configuration
 const SESSION_SECRET = getEnv("SESSION_SECRET", "local-dev-session-secret");
 
@@ -44,6 +47,7 @@ const LOG_LEVEL = getEnv("LOG_LEVEL", "info");
 
 const config = {
   port: PORT,
+  frontendUrl: FRONTEND_URL,
   sessionSecret: SESSION_SECRET,
   auth0: {
     domain: AUTH0_DOMAIN,
